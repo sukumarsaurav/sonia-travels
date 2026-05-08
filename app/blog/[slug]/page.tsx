@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: post.seoTitle,
     description: post.seoDesc,
     keywords: post.tags.join(', '),
-    openGraph: { title: post.seoTitle, description: post.seoDesc, type: 'article', publishedTime: post.publishedAt },
+    openGraph: { title: post.seoTitle, description: post.seoDesc, type: 'article' },
   }
 }
 
@@ -27,96 +27,67 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-/** Very lightweight markdown → HTML: headings, bold, tables, paragraphs */
-function renderBody(md: string) {
+/** Escape HTML special characters before applying inline transforms */
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+/** Convert inline markdown (bold, italic, links) to HTML string */
+function inl(text: string): string {
+  return esc(text)
+    .replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+?)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#c75b3a;text-decoration:underline">$1</a>')
+}
+
+/** Convert markdown body to an HTML string — no JSX, no dynamic element types */
+function mdToHtml(md: string): string {
   const lines = md.split('\n')
-  const out: React.ReactNode[] = []
+  const out: string[] = []
   let i = 0
 
   while (i < lines.length) {
     const line = lines[i]
 
-    // H2
     if (line.startsWith('## ')) {
-      out.push(<h2 key={i} style={{ fontFamily: 'var(--serif)', fontSize: 30, fontWeight: 500, margin: '40px 0 12px', letterSpacing: '-0.01em' }}>{line.slice(3)}</h2>)
+      out.push(`<h2 style="font-family:var(--serif);font-size:30px;font-weight:500;margin:40px 0 12px;letter-spacing:-0.01em">${inl(line.slice(3))}</h2>`)
       i++; continue
     }
-    // H3
     if (line.startsWith('### ')) {
-      out.push(<h3 key={i} style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, margin: '28px 0 8px' }}>{line.slice(4)}</h3>)
+      out.push(`<h3 style="font-family:var(--serif);font-size:22px;font-weight:500;margin:28px 0 8px">${inl(line.slice(4))}</h3>`)
       i++; continue
     }
-    // HR
     if (line.startsWith('---')) {
-      out.push(<hr key={i} style={{ border: 'none', borderTop: '1px solid var(--line)', margin: '32px 0' }}/>)
+      out.push('<hr style="border:none;border-top:1px solid #e5e0d6;margin:32px 0"/>')
       i++; continue
     }
-    // Table
     if (line.startsWith('|')) {
       const tableLines: string[] = []
       while (i < lines.length && lines[i].startsWith('|')) { tableLines.push(lines[i]); i++ }
-      const rows = tableLines.filter(l => !l.match(/^\|[-| ]+\|$/))
-      out.push(
-        <div key={`t${i}`} style={{ overflowX: 'auto', margin: '16px 0' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
-            {rows.map((row, ri) => {
-              const cells = row.split('|').slice(1, -1).map(c => c.trim())
-              const Tag = ri === 0 ? 'th' : 'td'
-              return (
-                <tr key={ri} style={{ background: ri === 0 ? 'var(--ink-900)' : ri % 2 === 0 ? 'white' : 'var(--sand-50)' }}>
-                  {cells.map((c, ci) => (
-                    <Tag key={ci} style={{ padding: '10px 14px', textAlign: 'left', borderBottom: '1px solid var(--line)', color: ri === 0 ? 'white' : 'inherit', fontFamily: ri === 0 ? 'var(--mono)' : undefined, fontSize: ri === 0 ? 11 : 14, letterSpacing: ri === 0 ? '0.1em' : undefined, textTransform: ri === 0 ? 'uppercase' : undefined }}>
-                      {renderInline(c)}
-                    </Tag>
-                  ))}
-                </tr>
-              )
-            })}
-          </table>
-        </div>
-      )
+      const rows = tableLines.filter(l => !/^\|[-| ]+\|$/.test(l))
+      const tHead = rows[0] ? `<thead><tr>${rows[0].split('|').slice(1,-1).map(c => `<th style="padding:10px 14px;text-align:left;background:#1c1c1c;color:white;font-size:11px;letter-spacing:0.1em;text-transform:uppercase">${esc(c.trim())}</th>`).join('')}</tr></thead>` : ''
+      const tBody = rows.slice(1).map((row, ri) => `<tr style="background:${ri % 2 === 0 ? 'white' : '#faf8f4'}">${row.split('|').slice(1,-1).map(c => `<td style="padding:10px 14px;border-bottom:1px solid #e5e0d6;font-size:14px">${inl(c.trim())}</td>`).join('')}</tr>`).join('')
+      out.push(`<div style="overflow-x:auto;margin:16px 0"><table style="width:100%;border-collapse:collapse;font-size:14px">${tHead}<tbody>${tBody}</tbody></table></div>`)
       continue
     }
-    // List item
-    if (line.startsWith('- **') || line.startsWith('- ')) {
+    if (line.startsWith('- ')) {
       const items: string[] = []
       while (i < lines.length && lines[i].startsWith('- ')) { items.push(lines[i].slice(2)); i++ }
-      out.push(
-        <ul key={`ul${i}`} style={{ paddingLeft: 20, margin: '12px 0', display: 'grid', gap: 6 }}>
-          {items.map((it, k) => <li key={k} style={{ fontSize: 15, color: 'var(--ink-700)', lineHeight: 1.6 }}>{renderInline(it)}</li>)}
-        </ul>
-      )
+      out.push(`<ul style="padding-left:20px;margin:12px 0">${items.map(it => `<li style="font-size:15px;color:#3d3530;line-height:1.6;margin-bottom:6px">${inl(it)}</li>`).join('')}</ul>`)
       continue
     }
-    // Numbered list
     if (/^\d+\. /.test(line)) {
       const items: string[] = []
       while (i < lines.length && /^\d+\. /.test(lines[i])) { items.push(lines[i].replace(/^\d+\. /, '')); i++ }
-      out.push(
-        <ol key={`ol${i}`} style={{ paddingLeft: 24, margin: '12px 0', display: 'grid', gap: 6 }}>
-          {items.map((it, k) => <li key={k} style={{ fontSize: 15, color: 'var(--ink-700)', lineHeight: 1.6 }}>{renderInline(it)}</li>)}
-        </ol>
-      )
+      out.push(`<ol style="padding-left:24px;margin:12px 0">${items.map(it => `<li style="font-size:15px;color:#3d3530;line-height:1.6;margin-bottom:6px">${inl(it)}</li>`).join('')}</ol>`)
       continue
     }
-    // Blank line
     if (line.trim() === '') { i++; continue }
-    // Paragraph
-    out.push(<p key={i} style={{ fontSize: 16, color: 'var(--ink-700)', lineHeight: 1.7, margin: '0 0 16px' }}>{renderInline(line)}</p>)
+    out.push(`<p style="font-size:16px;color:#3d3530;line-height:1.7;margin:0 0 16px">${inl(line)}</p>`)
     i++
   }
-  return out
-}
 
-function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[.+?\]\(.+?\))/g)
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) return <strong key={i}>{part.slice(2, -2)}</strong>
-    if (part.startsWith('*') && part.endsWith('*')) return <em key={i}>{part.slice(1, -1)}</em>
-    const linkMatch = part.match(/^\[(.+?)\]\((.+?)\)$/)
-    if (linkMatch) return <a key={i} href={linkMatch[2]} style={{ color: 'var(--terra-700)', textDecoration: 'underline' }}>{linkMatch[1]}</a>
-    return part
-  })
+  return out.join('\n')
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -138,7 +109,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 40, color: 'white' }}>
             <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
               <Link href="/blog" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16, textDecoration: 'none' }}>
-                ← All articles
+                <Ic.arrowL s={13}/> All articles
               </Link>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <span style={{ background: 'var(--terra-600)', color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{post.category}</span>
@@ -161,12 +132,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <p style={{ fontSize: 18, color: 'var(--ink-700)', lineHeight: 1.7, margin: '0 0 32px', fontStyle: 'italic', paddingBottom: 32, borderBottom: '1px solid var(--line)' }}>
             {post.excerpt}
           </p>
-          <div>{renderBody(post.body)}</div>
 
-          {/* ── Share / CTA strip ── */}
+          {/* Body rendered from HTML string — avoids dynamic JSX element types */}
+          <div dangerouslySetInnerHTML={{ __html: mdToHtml(post.body) }}/>
+
+          {/* ── CTA strip ── */}
           <div style={{ marginTop: 48, padding: '28px', background: 'var(--sand-100)', borderRadius: 14, border: '1px solid var(--sand-200)' }}>
             <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 8 }}>Planning this trip?</div>
-            <p style={{ fontSize: 14, color: 'var(--ink-700)', margin: '0 0 16px' }}>We handle cabs, packages, hotels and more from Pathankot. Call or WhatsApp us — we'll sort out the details.</p>
+            <p style={{ fontSize: 14, color: 'var(--ink-700)', margin: '0 0 16px' }}>We handle cabs, packages, hotels and more from Pathankot. Call or WhatsApp us — we will sort out the details.</p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ink-900)', color: 'white', padding: '11px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
                 <Ic.phone s={14}/> Call Now
@@ -175,7 +148,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <Ic.whatsapp s={14}/> WhatsApp
               </a>
               <Link href="/cabs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid var(--line)', color: 'var(--ink-900)', padding: '11px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
-                View cab fares →
+                View cab fares <Ic.arrow s={13}/>
               </Link>
             </div>
           </div>
