@@ -5,6 +5,7 @@ import { Btn, StatusPill, Pill } from '@/components/ui/Button'
 import { Ic } from '@/components/ui/Icons'
 import { Field, Input, Select, Textarea } from '@/components/ui/Form'
 import { Modal } from '@/components/ui/Modal'
+import { PackageModal } from '@/components/admin/PackageModal'
 import { createBrowserSupabase } from '@/lib/supabase-browser'
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -19,7 +20,8 @@ interface DBBooking {
 }
 interface DBPackage {
   id: string; name: string; region: string; tag: string; nights: number; days: number
-  price: number; hero: string; description: string; highlights: string[]; active: boolean
+  price: number; hero: string; hero_url?: string | null; description: string
+  highlights: string[]; itinerary: import('@/types').ItineraryDay[]; inclusions: string[]; exclusions: string[]; active: boolean
 }
 interface DBInquiry {
   id: string; name: string; phone: string; email: string | null
@@ -327,7 +329,7 @@ function AdminBookings({ onNewBooking }: { onNewBooking: () => void }) {
 }
 
 // ─── packages ─────────────────────────────────────────────────────────────────
-function AdminPackages({ onNewPackage }: { onNewPackage: (pkg?: DBPackage) => void }) {
+function AdminPackages({ onNewPackage, refreshKey }: { onNewPackage: (pkg?: DBPackage) => void; refreshKey: number }) {
   const supabase = createBrowserSupabase()
   const [packages, setPackages] = useState<DBPackage[]>([])
   const [loading, setLoading] = useState(true)
@@ -338,7 +340,7 @@ function AdminPackages({ onNewPackage }: { onNewPackage: (pkg?: DBPackage) => vo
     setLoading(false)
   }, [supabase])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load() }, [load, refreshKey])
 
   const toggleActive = async (pkg: DBPackage) => {
     await supabase.from('packages').update({ active: !pkg.active }).eq('id', pkg.id)
@@ -877,61 +879,6 @@ function NewBookingModal({ open, onClose, onSaved, prefill }: NewBookingModalPro
   )
 }
 
-// ─── package modal ────────────────────────────────────────────────────────────
-function PackageModal({ open, onClose, onSaved, pkg }: { open: boolean; onClose: () => void; onSaved: () => void; pkg?: DBPackage }) {
-  const supabase = createBrowserSupabase()
-  const [form, setForm] = useState({ name: '', region: '', tag: '', nights: '4', days: '5', price: '7200', description: '', highlights: '' })
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (open && pkg) setForm({ name: pkg.name, region: pkg.region, tag: pkg.tag, nights: String(pkg.nights), days: String(pkg.days), price: String(pkg.price), description: pkg.description, highlights: (pkg.highlights || []).join(', ') })
-    else if (open && !pkg) setForm({ name: '', region: '', tag: '', nights: '4', days: '5', price: '7200', description: '', highlights: '' })
-  }, [open, pkg])
-
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm(f => ({ ...f, [k]: e.target.value }))
-
-  const submit = async () => {
-    if (!form.name || !form.region) { setError('Name and region are required.'); return }
-    setSaving(true); setError('')
-    const payload = {
-      name: form.name, region: form.region, tag: form.tag,
-      nights: parseInt(form.nights, 10), days: parseInt(form.days, 10),
-      price: parseInt(form.price, 10), description: form.description,
-      highlights: form.highlights ? form.highlights.split(',').map(s => s.trim()).filter(Boolean) : [],
-      active: true, hero: 'terra',
-    }
-    const { error: err } = pkg
-      ? await supabase.from('packages').update(payload).eq('id', pkg.id)
-      : await supabase.from('packages').insert({ ...payload, id: form.name.toLowerCase().replace(/\s+/g, '-') })
-    if (err) { setError(err.message); setSaving(false); return }
-    setSaving(false); onSaved(); onClose()
-  }
-
-  return (
-    <Modal open={open} onClose={onClose} title={pkg ? 'Edit package' : 'Add package'} sub={pkg ? `Editing ${pkg.name}` : 'Create a new tour package'}
-      actions={<><Btn variant="ghost" onClick={onClose}>Cancel</Btn><Btn variant="dark" onClick={submit} disabled={saving}>{saving ? 'Saving…' : pkg ? 'Save changes' : 'Add package'}</Btn></>}>
-      {error && <div style={{ background: '#fadcd6', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: 'var(--terra-700)', marginBottom: 16 }}>{error}</div>}
-      <div style={{ display: 'grid', gap: 16 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-          <Field label="Destination name"><Input value={form.name} onChange={set('name')} placeholder="e.g. Spiti Valley" required/></Field>
-          <Field label="Region"><Input value={form.region} onChange={set('region')} placeholder="e.g. Himachal Pradesh" required/></Field>
-        </div>
-        <Field label="Tag / category"><Input value={form.tag} onChange={set('tag')} placeholder="Mountains, Beach, Heritage…"/></Field>
-        <Field label="Short description"><Textarea value={form.description} onChange={set('description')} placeholder="One-liner about the destination…"/></Field>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
-          <Field label="Nights"><Input type="number" value={form.nights} onChange={set('nights')}/></Field>
-          <Field label="Days"><Input type="number" value={form.days} onChange={set('days')}/></Field>
-          <Field label="Price / pax (₹)"><Input type="number" value={form.price} onChange={set('price')}/></Field>
-        </div>
-        <Field label="Highlights (comma-separated)" hint="e.g. Rohtang Pass, Solang Valley, Hadimba Temple">
-          <Input value={form.highlights} onChange={set('highlights')} placeholder="Highlight 1, Highlight 2…"/>
-        </Field>
-      </div>
-    </Modal>
-  )
-}
-
 // ─── shell ────────────────────────────────────────────────────────────────────
 export function AdminShell({ user }: { user: UserInfo }) {
   const supabase = createBrowserSupabase()
@@ -940,6 +887,7 @@ export function AdminShell({ user }: { user: UserInfo }) {
   const [showNewBooking, setShowNewBooking] = useState(false)
   const [showPackageModal, setShowPackageModal] = useState(false)
   const [editPkg, setEditPkg] = useState<DBPackage | undefined>(undefined)
+  const [pkgRefreshKey, setPkgRefreshKey] = useState(0)
   const [bookingPrefill, setBookingPrefill] = useState<{ name?: string; phone?: string; interest?: string } | undefined>(undefined)
   const [pendingCount, setPendingCount] = useState(0)
   const [unreadCount, setUnreadCount] = useState(0)
@@ -1031,7 +979,7 @@ export function AdminShell({ user }: { user: UserInfo }) {
       <main style={{ overflow: 'auto' }}>
         {route === 'dashboard' && <AdminDashboard onNewBooking={() => { setBookingPrefill(undefined); setShowNewBooking(true) }} goRoute={goRoute}/>}
         {route === 'bookings'  && <AdminBookings onNewBooking={() => { setBookingPrefill(undefined); setShowNewBooking(true) }}/>}
-        {route === 'packages'  && <AdminPackages onNewPackage={pkg => { setEditPkg(pkg); setShowPackageModal(true) }}/>}
+        {route === 'packages'  && <AdminPackages onNewPackage={pkg => { setEditPkg(pkg); setShowPackageModal(true) }} refreshKey={pkgRefreshKey}/>}
         {route === 'inquiries' && <AdminInquiries onConvertToBooking={inq => { setBookingPrefill({ name: inq.name, phone: inq.phone, interest: inq.interest || inq.message || '' }); setShowNewBooking(true); goRoute('bookings') }}/>}
         {route === 'payments'  && <AdminPayments/>}
         {route === 'customers' && <AdminCustomers/>}
@@ -1041,7 +989,7 @@ export function AdminShell({ user }: { user: UserInfo }) {
       </main>
 
       <NewBookingModal open={showNewBooking} onClose={() => setShowNewBooking(false)} onSaved={loadCounts} prefill={bookingPrefill}/>
-      <PackageModal open={showPackageModal} onClose={() => { setShowPackageModal(false); setEditPkg(undefined) }} onSaved={() => {}} pkg={editPkg}/>
+      <PackageModal open={showPackageModal} onClose={() => { setShowPackageModal(false); setEditPkg(undefined) }} onSaved={() => setPkgRefreshKey(k => k + 1)} pkg={editPkg}/>
     </div>
   )
 }

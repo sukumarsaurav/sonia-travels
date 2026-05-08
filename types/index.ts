@@ -1,3 +1,9 @@
+export interface ItineraryDay {
+  day: string
+  title: string
+  body: string
+}
+
 export interface Package {
   id: string
   name: string
@@ -5,9 +11,16 @@ export interface Package {
   days: number
   nights: number
   price: number
-  hero: 'terra' | 'forest' | 'dark'
+  hero: string
+  hero_url?: string | null
   tag: string
   desc: string
+  description?: string
+  highlights?: string[]
+  itinerary?: ItineraryDay[]
+  inclusions?: string[]
+  exclusions?: string[]
+  active?: boolean
 }
 
 export interface Booking {
