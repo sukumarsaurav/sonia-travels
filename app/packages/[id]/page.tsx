@@ -9,12 +9,17 @@ import { Ic } from '@/components/ui/Icons'
 import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { createServerSupabase } from '@/lib/supabase-server'
+import { createClient } from '@supabase/supabase-js'
 import type { Package, ItineraryDay } from '@/types'
 
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  const supabase = await createServerSupabase()
+  // generateStaticParams runs at build time — cannot use cookies()
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
   const { data } = await supabase.from('packages').select('id').eq('active', true)
   return (data || []).map(p => ({ id: p.id }))
 }
