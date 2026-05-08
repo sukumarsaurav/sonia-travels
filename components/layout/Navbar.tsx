@@ -11,7 +11,9 @@ import type { User } from '@supabase/supabase-js'
 const links = [
   { href: '/',         label: 'Home' },
   { href: '/packages', label: 'Packages' },
+  { href: '/cabs',     label: 'Cabs' },
   { href: '/services', label: 'Services' },
+  { href: '/blog',     label: 'Blog' },
   { href: '/about',    label: 'About' },
   { href: '/contact',  label: 'Contact' },
 ]
