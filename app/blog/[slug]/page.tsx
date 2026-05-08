@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { RevealProvider } from '@/components/ui/Reveal'
+import { Ic } from '@/components/ui/Icons'
 import { BLOG_POSTS } from '../data'
 
 export async function generateStaticParams() {
@@ -168,10 +169,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <p style={{ fontSize: 14, color: 'var(--ink-700)', margin: '0 0 16px' }}>We handle cabs, packages, hotels and more from Pathankot. Call or WhatsApp us — we'll sort out the details.</p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ink-900)', color: 'white', padding: '11px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                📞 Call Now
+                <Ic.phone s={14}/> Call Now
               </a>
               <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25D366', color: 'white', padding: '11px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                💬 WhatsApp
+                <Ic.whatsapp s={14}/> WhatsApp
               </a>
               <Link href="/cabs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid var(--line)', color: 'var(--ink-900)', padding: '11px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
                 View cab fares →

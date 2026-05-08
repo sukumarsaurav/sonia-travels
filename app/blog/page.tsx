@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
+import { Ic } from '@/components/ui/Icons'
 import { BLOG_POSTS } from './data'
 
 export const metadata: Metadata = {
@@ -101,7 +102,7 @@ export default function BlogPage() {
             <p style={{ fontSize: 16, opacity: 0.7, margin: '0 0 32px' }}>Cabs, tour packages, flights, hotels — one call does it all.</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
               <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--gold-500)', color: 'var(--ink-900)', padding: '14px 28px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
-                📞 +91 84602 22809
+                <Ic.phone s={15}/> +91 84602 22809
               </a>
               <Link href="/packages" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: 'var(--ink-900)', padding: '14px 28px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
                 View Tour Packages →

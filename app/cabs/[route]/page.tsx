@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
+import { Ic } from '@/components/ui/Icons'
 import { CAB_ROUTES, VEHICLE_TYPES } from '../data'
 
 export async function generateStaticParams() {
@@ -25,6 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ route: st
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
 
+const VEHICLE_ICONS = { sedan: Ic.car, suv: Ic.car, tt: Ic.truck }
+
 export default async function CabRoutePage({ params }: { params: Promise<{ route: string }> }) {
   const { route } = await params
   const r = CAB_ROUTES.find(r => r.slug === route)
@@ -41,7 +44,7 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
         <div style={{ background: 'linear-gradient(135deg, #0f1f0f 0%, #1c2e1c 100%)', paddingTop: 96, paddingBottom: 72, color: 'white' }}>
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px' }}>
             <Link href="/cabs" style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 20, textDecoration: 'none' }}>
-              ← All cab routes
+              <Ic.arrowL s={13}/> All cab routes
             </Link>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.18em', color: 'var(--gold-500)', textTransform: 'uppercase', marginBottom: 12 }}>
               {r.distance} · {r.duration} · from Pathankot
@@ -54,13 +57,14 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
               {r.description}
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--gold-500)', color: 'var(--ink-900)', padding: '14px 28px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
-                📞 Book Now — Call Us
+              <a href="tel:+918460222809"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--gold-500)', color: 'var(--ink-900)', padding: '14px 28px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+                <Ic.phone s={16}/> Book Now — Call Us
               </a>
               <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#25D366', color: 'white', padding: '14px 28px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
-                💬 WhatsApp Us
+                <Ic.whatsapp s={16}/> WhatsApp Us
               </a>
             </div>
           </div>
@@ -71,30 +75,35 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '48px 32px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 20 }}>Fare details</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="grid-3">
-              {VEHICLE_TYPES.map(v => (
-                <div key={v.id} style={{ background: 'white', border: '2px solid var(--line)', borderRadius: 16, padding: 28, textAlign: 'center' }}>
-                  <div style={{ fontSize: 40, marginBottom: 8 }}>{v.icon}</div>
-                  <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 16 }}>{v.examples} · upto {v.seats} pax</div>
-                  <div style={{ fontFamily: 'var(--serif)', fontSize: 44, fontWeight: 600, color: 'var(--forest-700)', lineHeight: 1, marginBottom: 4 }}>
-                    {formatINR(r[v.priceKey])}
+              {VEHICLE_TYPES.map(v => {
+                const VIcon = VEHICLE_ICONS[v.id as keyof typeof VEHICLE_ICONS] ?? Ic.car
+                return (
+                  <div key={v.id} style={{ background: 'white', border: '2px solid var(--line)', borderRadius: 16, padding: 28, textAlign: 'center' }}>
+                    <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
+                      <VIcon s={28}/>
+                    </div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 16 }}>{v.examples} · upto {v.seats} pax</div>
+                    <div style={{ fontFamily: 'var(--serif)', fontSize: 44, fontWeight: 600, color: 'var(--forest-700)', lineHeight: 1, marginBottom: 4 }}>
+                      {formatINR(r[v.priceKey])}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 20 }}>one way · all-inclusive</div>
+                    <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+${v.name}+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--ink-900)', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                      <Ic.whatsapp s={14}/> Book {v.name}
+                    </a>
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 20 }}>one way · all-inclusive</div>
-                  <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+${v.name}+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'block', background: 'var(--ink-900)', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                    Book {v.name}
-                  </a>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <p style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 12 }}>
-              * One-way fare. Toll, state permits &amp; parking included. Round-trip bookings get 10% off return leg. Night charges: ₹300 extra if drop after 11 PM.
+              One-way fare. Toll, state permits &amp; parking included. Round-trip bookings get 10% off return leg. Night charges: ₹300 extra if drop after 11 PM.
             </p>
           </div>
         </div>
 
-        {/* ── Route highlights + details ── */}
+        {/* ── Route details + sidebar ── */}
         <Section padded>
           <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 64, alignItems: 'start' }} className="pkg-detail-grid">
             <div>
@@ -102,23 +111,23 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
                 About this route
               </h2>
               <p style={{ fontSize: 16, color: 'var(--ink-700)', lineHeight: 1.65, marginBottom: 32 }}>
-                {r.description} Our drivers know every pothole, shortcut and rest stop on this route — so you travel comfortably and arrive on time.
+                {r.description} Our drivers know every stretch of this route — so you travel comfortably and arrive on time.
               </p>
 
               <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: '0 0 16px' }}>Route highlights</h3>
               <div style={{ display: 'grid', gap: 10, marginBottom: 32 }}>
                 {r.highlights.map(h => (
                   <div key={h} style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 15, color: 'var(--ink-700)', padding: '10px 14px', background: 'var(--sand-50)', border: '1px solid var(--sand-200)', borderRadius: 8 }}>
-                    <span style={{ color: 'var(--forest-600)' }}>✓</span> {h}
+                    <span style={{ color: 'var(--forest-600)', flexShrink: 0 }}><Ic.check s={14}/></span> {h}
                   </div>
                 ))}
               </div>
 
-              <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: '0 0 16px' }}>What's included</h3>
+              <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: '0 0 16px' }}>What is included</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 32 }}>
                 {['Fuel & driver charges', 'All state permits & toll', 'Air-conditioned vehicle', 'GPS tracking', 'GST (if applicable)', 'Parking at drop point'].map(item => (
-                  <div key={item} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--ink-700)' }}>
-                    <span style={{ color: 'var(--forest-600)', flexShrink: 0, marginTop: 1 }}>✓</span> {item}
+                  <div key={item} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--ink-700)', alignItems: 'flex-start' }}>
+                    <span style={{ color: 'var(--forest-600)', flexShrink: 0, marginTop: 1 }}><Ic.check s={13}/></span> {item}
                   </div>
                 ))}
               </div>
@@ -126,8 +135,8 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
               <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: '0 0 16px' }}>Not included</h3>
               <div style={{ display: 'grid', gap: 6 }}>
                 {['Passenger food & accommodation', 'Night charges if drop after 11 PM (₹300)', 'Multiple stopovers beyond 30 min total'].map(item => (
-                  <div key={item} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--ink-500)' }}>
-                    <span style={{ flexShrink: 0 }}>×</span> {item}
+                  <div key={item} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--ink-500)', alignItems: 'flex-start' }}>
+                    <span style={{ flexShrink: 0, marginTop: 1 }}><Ic.x s={13}/></span> {item}
                   </div>
                 ))}
               </div>
@@ -154,19 +163,28 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
 
               <a href="tel:+918460222809"
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--ink-900)', color: 'white', padding: '14px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none', marginBottom: 8 }}>
-                📞 Call to Book
+                <Ic.phone s={15}/> Call to Book
               </a>
               <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#25D366', color: 'white', padding: '14px', borderRadius: 8, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
-                💬 WhatsApp Us
+                <Ic.whatsapp s={15}/> WhatsApp Us
               </a>
 
               <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px dashed var(--line)', display: 'grid', gap: 8, fontSize: 12, color: 'var(--ink-700)' }}>
-                <div>✅ Fixed price — no surge</div>
-                <div>✅ Verified, trained driver</div>
-                <div>✅ AC vehicle guaranteed</div>
-                <div>✅ 24×7 helpline</div>
+                {[
+                  [Ic.tag,        'Fixed price — no surge'],
+                  [Ic.shield,     'Verified, trained driver'],
+                  [Ic.check,      'AC vehicle guaranteed'],
+                  [Ic.phone,      '24×7 helpline'],
+                ].map(([Icon, label], i) => {
+                  const I = Icon as React.FC<{ s: number }>
+                  return (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ color: 'var(--forest-600)' }}><I s={13}/></span> {label as string}
+                    </div>
+                  )
+                })}
               </div>
             </aside>
           </div>
@@ -182,7 +200,9 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
                     <div className="lift" style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 12, padding: 20 }}>
                       <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 500, marginBottom: 4 }}>{rel.from} → {rel.to}</div>
                       <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 12 }}>{rel.distance} · {rel.duration}</div>
-                      <div style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: 16, color: 'var(--forest-700)' }}>{formatINR(rel.sedanPrice)} <span style={{ fontSize: 11, color: 'var(--ink-500)', fontWeight: 400 }}>sedan</span></div>
+                      <div style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: 16, color: 'var(--forest-700)' }}>
+                        {formatINR(rel.sedanPrice)} <span style={{ fontSize: 11, color: 'var(--ink-500)', fontWeight: 400 }}>sedan</span>
+                      </div>
                     </div>
                   </Link>
                 ))}
