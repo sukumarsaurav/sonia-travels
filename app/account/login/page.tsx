@@ -42,9 +42,16 @@ function AuthForm() {
       if (error) setError(error.message)
       else setSuccess('Check your email for a confirmation link.')
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) setError(error.message)
-      else router.push('/account')
+      else if (data.user) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+        router.push(profile?.role === 'admin' ? '/admin' : '/account')
+      }
     }
     setLoading(false)
   }

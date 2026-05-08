@@ -5,7 +5,6 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/admin'
 
   if (code) {
     const cookieStore = await cookies()
@@ -24,11 +23,18 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+    const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && user) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const dest = profile?.role === 'admin' ? '/admin' : '/account'
+      return NextResponse.redirect(`${origin}${dest}`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/admin/login?error=auth_failed`)
+  return NextResponse.redirect(`${origin}/account/login?error=auth_failed`)
 }
