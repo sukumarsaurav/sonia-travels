@@ -128,7 +128,7 @@ export const CAB_ROUTES: CabRoute[] = [
 ]
 
 export const VEHICLE_TYPES = [
-  { id: 'sedan', name: 'Sedan', examples: 'Swift Dzire, Etios, Amaze', seats: 4, priceKey: 'sedanPrice' as const, icon: '🚗', rate: '₹12/km', desc: 'Comfortable for 1–4 passengers, best value for couples & small families.' },
-  { id: 'suv', name: 'SUV / MUV', examples: 'Innova, Ertiga, Crysta', seats: 7, priceKey: 'suvPrice' as const, icon: '🚙', rate: '₹16/km', desc: 'Spacious for families, ideal for mountain terrain and 5–7 passengers.' },
-  { id: 'tt', name: 'Tempo Traveller', examples: '9 / 12 / 17 seater', seats: 17, priceKey: 'ttPrice' as const, icon: '🚌', rate: '₹28/km', desc: 'Perfect for groups, pilgrimages, school trips and corporate outings.' },
+  { id: 'sedan', name: 'Sedan',           examples: 'Swift Dzire, Etios, Amaze', seats: 4,  priceKey: 'sedanPrice' as const, rate: '₹12/km', desc: 'Comfortable for 1–4 passengers, best value for couples & small families.' },
+  { id: 'suv',   name: 'SUV / MUV',       examples: 'Innova, Ertiga, Crysta',    seats: 7,  priceKey: 'suvPrice'   as const, rate: '₹16/km', desc: 'Spacious for families, ideal for mountain terrain and 5–7 passengers.' },
+  { id: 'tt',    name: 'Tempo Traveller', examples: '9 / 12 / 17 seater',        seats: 17, priceKey: 'ttPrice'    as const, rate: '₹28/km', desc: 'Perfect for groups, pilgrimages, school trips and corporate outings.' },
 ]

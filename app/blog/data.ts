@@ -264,7 +264,7 @@ For elderly pilgrims or those short on time, helicopters operate between **Sanji
 ## Booking your cab from Pathankot to Katra
 
 **Sonia Travels** runs cab services to Katra from Pathankot year-round.
-📞 **+91 84602 22809** | WhatsApp same number
+**+91 84602 22809** | WhatsApp same number
 Round-trip bookings available with flexible return timing based on your yatra completion.`,
   },
   {
@@ -328,6 +328,6 @@ Where to book: Travel agencies in Pathankot, or directly with Sonia Travels
 
 We've been operating in Pathankot for over 15 years. All our drivers are locally vetted, vehicles are GPS-tracked, and fares are transparent — what we quote is what you pay.
 
-📞 **+91 84602 22809** (Call & WhatsApp · 24×7)`,
+**+91 84602 22809** (Call & WhatsApp · 24×7)`,
   },
 ]
