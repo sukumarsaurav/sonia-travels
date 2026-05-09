@@ -7,19 +7,38 @@ import { Ic } from '@/components/ui/Icons'
 import { PACKAGES } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
 
+// Default to next month so the date picker is never in the past
+function nextMonthValue() {
+  const d = new Date()
+  d.setMonth(d.getMonth() + 1)
+  return d.toISOString().slice(0, 7) // "YYYY-MM"
+}
+
 export function ContactSection() {
-  const [form, setForm] = useState({ name: '', phone: '', destination: '', travelers: '2', dates: '2026-06', notes: '' })
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [form, setForm] = useState({ name: '', phone: '', destination: '', travelers: '2', dates: nextMonthValue(), notes: '' })
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (status === 'sending') return
     setStatus('sending')
-    await supabase.from('inquiries').insert({
-      name: form.name, phone: form.phone,
-      interest: `${form.destination} · ${form.travelers} pax · ${form.dates}${form.notes ? ' · ' + form.notes : ''}`,
-      channel: 'Web Form', unread: true,
-    })
-    setStatus('sent')
+    try {
+      const { error } = await supabase.from('inquiries').insert({
+        name: form.name, phone: form.phone,
+        interest: `${form.destination} · ${form.travelers} pax · ${form.dates}${form.notes ? ' · ' + form.notes : ''}`,
+        channel: 'Web Form', unread: true,
+      })
+      if (error) throw error
+      setStatus('sent')
+      // Auto-reset form after 6 seconds so user can submit again
+      setTimeout(() => {
+        setStatus('idle')
+        setForm({ name: '', phone: '', destination: '', travelers: '2', dates: nextMonthValue(), notes: '' })
+      }, 6000)
+    } catch {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 4000)
+    }
   }
 
   return (
@@ -51,6 +70,10 @@ export function ContactSection() {
             {status === 'sent' ? (
               <div style={{ background: 'var(--forest-100)', color: 'var(--forest-700)', padding: 20, borderRadius: 10, fontSize: 14 }}>
                 ✓ Inquiry sent! We'll get back to you shortly on WhatsApp or phone.
+              </div>
+            ) : status === 'error' ? (
+              <div style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', padding: 20, borderRadius: 10, fontSize: 14 }}>
+                ✗ Something went wrong. Please WhatsApp us directly on +91 84602 22809.
               </div>
             ) : (
               <div style={{ display: 'grid', gap: 16 }}>

@@ -19,9 +19,10 @@ export function PackageCard({ pkg, featured }: { pkg: Package; featured?: boolea
             src={pkg.hero_url}
             alt={pkg.name}
             fill
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
             priority={featured}
+            loading={featured ? 'eager' : 'lazy'}
           />
         ) : (
           <div className={`ph-img ${pkg.hero}`} style={{ height: '100%' }}/>

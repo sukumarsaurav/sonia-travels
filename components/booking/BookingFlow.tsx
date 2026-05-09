@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Btn } from '@/components/ui/Button'
 import { Field, Input, Textarea } from '@/components/ui/Form'
 import { Ic } from '@/components/ui/Icons'
@@ -34,17 +34,27 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
   const [success, setSuccess] = useState(false)
 
   const handlePay = async () => {
+    if (processing) return
     setProcessing(true)
-    const bookingId = 'STT-' + Math.floor(2000 + Math.random() * 1000)
-    await supabase.from('bookings').insert({
-      booking_id: bookingId,
-      customer: data.name, phone: data.phone, email: data.email,
-      package: pkg.name, travelers: data.travelers,
-      depart: data.depart, amount: total,
-      status: 'Pending', payment: `Razorpay · ${method.toUpperCase()}`,
-      room: data.room, notes: data.notes || '',
-    })
-    setTimeout(() => { setProcessing(false); setSuccess(true) }, 2000)
+    try {
+      // Generate a collision-resistant booking ID using timestamp + random suffix
+      const bookingId = 'STT-' + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).toUpperCase().slice(2, 5)
+      const { error } = await supabase.from('bookings').insert({
+        booking_id: bookingId,
+        customer: data.name, phone: data.phone, email: data.email,
+        package: pkg.name, travelers: data.travelers,
+        depart: data.depart, amount: total,
+        status: 'Pending', payment: `Razorpay · ${method.toUpperCase()}`,
+        room: data.room, notes: data.notes || '',
+      })
+      if (error) throw error
+      setSuccess(true)
+    } catch {
+      // On error, keep form open — don't silently fail
+      alert('Booking could not be saved. Please WhatsApp us on +91 84602 22809 to confirm.')
+    } finally {
+      setProcessing(false)
+    }
   }
 
   if (success) return (
@@ -99,12 +109,26 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
   )
 }
 
+// Default depart date = 14 days from today
+function defaultDepart() {
+  const d = new Date()
+  d.setDate(d.getDate() + 14)
+  return d.toISOString().split('T')[0]
+}
+
 export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
   const pkg = PACKAGES.find(p => p.id === pkgId) || PACKAGES[0]
   const [step, setStep] = useState(0)
-  const [data, setData] = useState({ travelers: 2, depart: '2026-05-20', room: 'twin', name: '', email: '', phone: '', notes: '', addons: { insurance: true, photo: false, airport: true } })
+  const [data, setData] = useState({ travelers: 2, depart: defaultDepart(), room: 'twin', name: '', email: '', phone: '', notes: '', addons: { insurance: true, photo: false, airport: true } })
   const setD = (k: string, v: any) => setData(d => ({ ...d, [k]: v }))
   const toggleAddon = (k: string) => setData(d => ({ ...d, addons: { ...d.addons, [k]: !d.addons[k as keyof typeof d.addons] } }))
+
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onClose])
 
   const addonPrices = { insurance: 600, photo: 2400, airport: 1200 }
   const baseTotal = pkg.price * data.travelers
@@ -114,7 +138,7 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
   const stepNames = ['Trip details', 'Your info', 'Add-ons & review', 'Payment']
 
   return (
-    <div className="booking-modal-wrap" style={{ position: 'fixed', inset: 0, background: 'rgba(26,24,20,0.55)', zIndex: 100, display: 'grid', placeItems: 'center', padding: 24 }}>
+    <div className="booking-modal-wrap modal-scrim" role="dialog" aria-modal="true" aria-label="Book a trip" style={{ position: 'fixed', inset: 0, background: 'rgba(26,24,20,0.55)', zIndex: 100, display: 'grid', placeItems: 'center', padding: 24 }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="booking-modal" style={{ background: 'var(--sand-50)', width: '100%', maxWidth: 1080, maxHeight: '92vh', borderRadius: 16, overflow: 'hidden', display: 'grid', gridTemplateColumns: '1.5fr 1fr', boxShadow: 'var(--shadow-lg)' }}>
         <div className="booking-main" style={{ padding: '32px 40px', overflow: 'auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>

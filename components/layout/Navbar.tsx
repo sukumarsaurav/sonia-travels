@@ -43,10 +43,9 @@ function UserMenu({ user }: { user: User }) {
     <div ref={ref} style={{ position: 'relative' }}>
       <button onClick={() => setOpen(!open)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', border: '1px solid var(--line)', borderRadius: 99, background: 'white', cursor: 'pointer' }}>
         {avatar ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatar} alt={name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}/>
+          <img src={avatar} alt="" aria-hidden="true" width={28} height={28} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} referrerPolicy="no-referrer"/>
         ) : (
-          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--terra-600)', color: 'white', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700 }}>{initials}</div>
+          <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--terra-600)', color: 'white', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700 }} aria-hidden="true">{initials}</div>
         )}
         <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-900)', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name.split(' ')[0]}</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--ink-400)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}><path d="M6 9l6 6 6-6"/></svg>
@@ -80,10 +79,10 @@ export function Navbar() {
   const supabase = createBrowserSupabase()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null))
     return () => subscription.unsubscribe()
-  }, [supabase])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <header style={{ borderBottom: '1px solid var(--line)', background: 'rgba(250,246,240,0.92)', backdropFilter: 'blur(10px)', position: 'sticky', top: 0, zIndex: 50 }}>
