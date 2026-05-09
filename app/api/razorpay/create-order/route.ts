@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Razorpay from 'razorpay'
 
-const rzp = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-})
+// Mark as dynamic so Next.js never tries to pre-render this route at build time
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
+  const keyId = process.env.RAZORPAY_KEY_ID
+  const keySecret = process.env.RAZORPAY_KEY_SECRET
+
+  if (!keyId || !keySecret || keyId.includes('REPLACE_ME')) {
+    return NextResponse.json({ error: 'Razorpay keys not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your environment variables.' }, { status: 503 })
+  }
+
+  // Instantiate inside handler — avoids build-time evaluation when keys are absent
+  const rzp = new Razorpay({ key_id: keyId, key_secret: keySecret })
+
   const { amount, currency = 'INR', receipt } = await req.json()
 
   if (!amount || typeof amount !== 'number' || amount < 100) {
