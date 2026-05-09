@@ -26,7 +26,6 @@ export async function generateMetadata({ params }: { params: Promise<{ route: st
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
 
-const VEHICLE_ICONS = { sedan: Ic.car, suv: Ic.car, tt: Ic.truck }
 
 export default async function CabRoutePage({ params }: { params: Promise<{ route: string }> }) {
   const { route } = await params
@@ -75,27 +74,24 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '48px 32px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 20 }}>Fare details</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="grid-3">
-              {VEHICLE_TYPES.map(v => {
-                const VIcon = VEHICLE_ICONS[v.id as keyof typeof VEHICLE_ICONS] ?? Ic.car
-                return (
-                  <div key={v.id} style={{ background: 'white', border: '2px solid var(--line)', borderRadius: 16, padding: 28, textAlign: 'center' }}>
-                    <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
-                      <VIcon s={28}/>
-                    </div>
-                    <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 16 }}>{v.examples} · upto {v.seats} pax</div>
-                    <div style={{ fontFamily: 'var(--serif)', fontSize: 44, fontWeight: 600, color: 'var(--forest-700)', lineHeight: 1, marginBottom: 4 }}>
-                      {formatINR(r[v.priceKey])}
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 20 }}>one way · all-inclusive</div>
-                    <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+${v.name}+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
-                      target="_blank" rel="noopener noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--ink-900)', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                      <Ic.whatsapp s={14}/> Book {v.name}
-                    </a>
+              {VEHICLE_TYPES.map(v => (
+                <div key={v.id} style={{ background: 'white', border: '2px solid var(--line)', borderRadius: 16, padding: 28, textAlign: 'center' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', margin: '0 auto 16px' }}>
+                    {v.id === 'tt' ? <Ic.truck s={28}/> : <Ic.car s={28}/>}
                   </div>
-                )
-              })}
+                  <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 16 }}>{v.examples} · upto {v.seats} pax</div>
+                  <div style={{ fontFamily: 'var(--serif)', fontSize: 44, fontWeight: 600, color: 'var(--forest-700)', lineHeight: 1, marginBottom: 4 }}>
+                    {formatINR(r[v.priceKey])}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 20 }}>one way · all-inclusive</div>
+                  <a href={`https://wa.me/918460222809?text=Hi%2C+I+need+a+${v.name}+cab+from+${encodeURIComponent(r.from)}+to+${encodeURIComponent(r.to)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'var(--ink-900)', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                    <Ic.whatsapp s={14}/> Book {v.name}
+                  </a>
+                </div>
+              ))}
             </div>
             <p style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 12 }}>
               One-way fare. Toll, state permits &amp; parking included. Round-trip bookings get 10% off return leg. Night charges: ₹300 extra if drop after 11 PM.
@@ -172,16 +168,16 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
               </a>
 
               <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px dashed var(--line)', display: 'grid', gap: 8, fontSize: 12, color: 'var(--ink-700)' }}>
-                {[
-                  [Ic.tag,        'Fixed price — no surge'],
-                  [Ic.shield,     'Verified, trained driver'],
-                  [Ic.check,      'AC vehicle guaranteed'],
-                  [Ic.phone,      '24×7 helpline'],
-                ].map(([Icon, label], i) => {
-                  const I = Icon as React.FC<{ s: number }>
+                {(['tag|Fixed price — no surge', 'shield|Verified, trained driver', 'check|AC vehicle guaranteed', 'phone|24×7 helpline'] as const).map((item, i) => {
+                  const [iconKey, label] = item.split('|')
                   return (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ color: 'var(--forest-600)' }}><I s={13}/></span> {label as string}
+                      <span style={{ color: 'var(--forest-600)' }}>
+                        {iconKey === 'tag'    && <Ic.tag s={13}/>}
+                        {iconKey === 'shield' && <Ic.shield s={13}/>}
+                        {iconKey === 'check'  && <Ic.check s={13}/>}
+                        {iconKey === 'phone'  && <Ic.phone s={13}/>}
+                      </span> {label}
                     </div>
                   )
                 })}

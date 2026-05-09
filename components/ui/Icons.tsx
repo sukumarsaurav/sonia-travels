@@ -1,5 +1,3 @@
-'use client'
-
 interface IconProps { s?: number; style?: React.CSSProperties; color?: string }
 
 const ic = (d: string) => ({ s = 20, style, color }: IconProps) => (

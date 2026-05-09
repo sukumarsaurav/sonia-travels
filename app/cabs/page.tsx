@@ -20,17 +20,6 @@ export const metadata: Metadata = {
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
 
-const WHY_US = [
-  { Icon: Ic.shield,     title: 'Verified & trained drivers',  desc: 'All drivers are police-verified, licensed and familiar with mountain routes.' },
-  { Icon: Ic.navigation, title: 'GPS-tracked vehicles',        desc: 'Real-time tracking on every cab. Share your live location with family.' },
-  { Icon: Ic.clock,      title: 'On-time guarantee',           desc: 'We track your flight/train and adjust pickup time automatically.' },
-  { Icon: Ic.tag,        title: 'Fixed transparent fares',     desc: 'Price quoted is price paid. No surge, no hidden charges, no waiting fees.' },
-  { Icon: Ic.phone,      title: '24×7 helpline',               desc: 'Call or WhatsApp any time — before, during or after your journey.' },
-  { Icon: Ic.mountain,   title: 'Mountain road expertise',     desc: 'Our drivers handle Himachal & J&K routes including Rohtang, Jalori, Sinthan.' },
-]
-
-const VEHICLE_ICONS = { sedan: Ic.car, suv: Ic.car, tt: Ic.truck }
-
 const POPULAR_ROUTES = CAB_ROUTES.filter(r => r.popular)
 const ALL_ROUTES = CAB_ROUTES
 
@@ -80,20 +69,17 @@ export default function CabsPage() {
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '48px 32px' }}>
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 24 }}>Fleet</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="grid-3">
-              {VEHICLE_TYPES.map(v => {
-                const VIcon = VEHICLE_ICONS[v.id as keyof typeof VEHICLE_ICONS] ?? Ic.car
-                return (
-                  <div key={v.id} style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 20px' }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', marginBottom: 14 }}>
-                      <VIcon s={22}/>
-                    </div>
-                    <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
-                    <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 8 }}>{v.examples} · {v.seats} seats</div>
-                    <div style={{ fontSize: 13, color: 'var(--ink-700)', lineHeight: 1.5, marginBottom: 12 }}>{v.desc}</div>
-                    <div style={{ fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: 'var(--forest-700)' }}>{v.rate}</div>
+              {VEHICLE_TYPES.map(v => (
+                <div key={v.id} style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 14, padding: '24px 20px' }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', marginBottom: 14 }}>
+                    {v.id === 'tt' ? <Ic.truck s={22}/> : <Ic.car s={22}/>}
                   </div>
-                )
-              })}
+                  <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 8 }}>{v.examples} · {v.seats} seats</div>
+                  <div style={{ fontSize: 13, color: 'var(--ink-700)', lineHeight: 1.5, marginBottom: 12 }}>{v.desc}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: 'var(--forest-700)' }}>{v.rate}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -173,10 +159,22 @@ export default function CabsPage() {
         {/* ── Why us ── */}
         <Section eyebrow="Why choose us" title="Pathankot's trusted taxi service.">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="grid-3">
-            {WHY_US.map(({ Icon, title, desc }, i) => (
+            {([
+              ['shield',     'Verified & trained drivers',  'All drivers are police-verified, licensed and familiar with mountain routes.'],
+              ['navigation', 'GPS-tracked vehicles',        'Real-time tracking on every cab. Share your live location with family.'],
+              ['clock',      'On-time guarantee',           'We track your flight/train and adjust pickup time automatically.'],
+              ['tag',        'Fixed transparent fares',     'Price quoted is price paid. No surge, no hidden charges, no waiting fees.'],
+              ['phone',      '24×7 helpline',               'Call or WhatsApp any time — before, during or after your journey.'],
+              ['mountain',   'Mountain road expertise',     'Our drivers handle Himachal & J&K routes including Rohtang, Jalori, Sinthan.'],
+            ] as [string, string, string][]).map(([iconKey, title, desc], i) => (
               <div key={i} className="reveal" style={{ padding: '24px 20px', background: 'var(--sand-50)', border: '1px solid var(--line)', borderRadius: 14, transitionDelay: `${i * 0.07}s` }}>
                 <div style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--terra-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', marginBottom: 14 }}>
-                  <Icon s={20}/>
+                  {iconKey === 'shield'     && <Ic.shield s={20}/>}
+                  {iconKey === 'navigation' && <Ic.navigation s={20}/>}
+                  {iconKey === 'clock'      && <Ic.clock s={20}/>}
+                  {iconKey === 'tag'        && <Ic.tag s={20}/>}
+                  {iconKey === 'phone'      && <Ic.phone s={20}/>}
+                  {iconKey === 'mountain'   && <Ic.mountain s={20}/>}
                 </div>
                 <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 500, marginBottom: 6 }}>{title}</div>
                 <div style={{ fontSize: 13, color: 'var(--ink-700)', lineHeight: 1.55 }}>{desc}</div>
