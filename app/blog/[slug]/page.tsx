@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
 import { BLOG_POSTS } from '../data'
+import { ArticleSchema } from '@/components/seo/JsonLd'
 
 export async function generateStaticParams() {
   return BLOG_POSTS.map(p => ({ slug: p.slug }))
@@ -19,7 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: post.seoTitle,
     description: post.seoDesc,
     keywords: post.tags.join(', '),
-    openGraph: { title: post.seoTitle, description: post.seoDesc, type: 'article' },
+    openGraph: { title: post.seoTitle, description: post.seoDesc, type: 'article', url: `https://soniatravels.in/blog/${post.slug}` },
+    alternates: { canonical: `https://soniatravels.in/blog/${post.slug}` },
   }
 }
 
@@ -98,6 +100,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const related = BLOG_POSTS.filter(p => p.slug !== slug).slice(0, 3)
 
   return (
+    <>
+      <ArticleSchema post={post}/>
     <RevealProvider>
       <Navbar/>
       <main>
@@ -177,5 +181,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       </main>
       <Footer/>
     </RevealProvider>
+    </>
   )
 }

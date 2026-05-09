@@ -7,6 +7,7 @@ import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
 import { CAB_ROUTES, VEHICLE_TYPES } from './data'
 import { FAQAccordion } from '@/components/ui/FAQAccordion'
+import { CabServiceSchema, FAQSchema } from '@/components/seo/JsonLd'
 
 export const metadata: Metadata = {
   title: 'Cab & Taxi Services in Pathankot | Outstation Cabs from ₹12/km | Sonia Travels',
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
     title: 'Cab & Taxi Services in Pathankot — Sonia Travels',
     description: 'Outstation cabs from Pathankot to Dalhousie, Dharamshala, Amritsar, Jammu, Katra, Manali and more. Book 24×7.',
     type: 'website',
+    url: 'https://soniatravels.in/cabs',
   },
+  alternates: { canonical: 'https://soniatravels.in/cabs' },
 }
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
@@ -25,7 +28,18 @@ const POPULAR_ROUTES = CAB_ROUTES.filter(r => r.popular)
 const ALL_ROUTES = CAB_ROUTES
 
 export default function CabsPage() {
+  const cabFaqs = [
+    { q: 'Are the fares one-way or round-trip?', a: 'All fares listed are one-way. For round trips we offer a 10% discount on the return leg. Inform us at the time of booking for the best rate.' },
+    { q: 'Is there a waiting charge if my train/flight is delayed?', a: 'We track your PNR / flight number and adjust pickup time automatically at no extra charge up to 60 minutes. Beyond that, ₹150/hour waiting applies.' },
+    { q: 'What vehicles are available for large groups?', a: 'We have 9-seater, 12-seater and 17-seater Tempo Travellers for groups. For very large groups (20+) we can arrange multiple vehicles.' },
+    { q: 'Do you operate to/from Pathankot Railway Station and Bus Stand?', a: 'Yes, we cover Pathankot Cantt Railway Station, Pathankot City Railway Station, and ISBT Pathankot for all pickups and drops.' },
+    { q: 'Can I book a cab for multiple days (outstation multi-day)?', a: 'Absolutely. We offer multi-day cab rentals for Himachal and J&K circuits. Pricing is based on km + driver night allowance. Contact us for a quote.' },
+  ]
+
   return (
+    <>
+      <CabServiceSchema/>
+      <FAQSchema items={cabFaqs}/>
     <RevealProvider>
       <Navbar/>
       <main>
@@ -208,17 +222,12 @@ export default function CabsPage() {
 
         {/* ── FAQ ── */}
         <Section eyebrow="FAQ" title="Common questions.">
-          <FAQAccordion items={[
-            { q: 'Are the fares one-way or round-trip?', a: 'All fares listed are one-way. For round trips we offer a 10% discount on the return leg. Inform us at the time of booking for the best rate.' },
-            { q: 'Is there a waiting charge if my train/flight is delayed?', a: 'We track your PNR / flight number and adjust pickup time automatically at no extra charge up to 60 minutes. Beyond that, ₹150/hour waiting applies.' },
-            { q: 'What vehicles are available for large groups?', a: 'We have 9-seater, 12-seater and 17-seater Tempo Travellers for groups. For very large groups (20+) we can arrange multiple vehicles.' },
-            { q: 'Do you operate to/from Pathankot Railway Station and Bus Stand?', a: 'Yes, we cover Pathankot Cantt Railway Station, Pathankot City Railway Station, and ISBT Pathankot for all pickups and drops.' },
-            { q: 'Can I book a cab for multiple days (outstation multi-day)?', a: 'Absolutely. We offer multi-day cab rentals for Himachal and J&K circuits. Pricing is based on km + driver night allowance. Contact us for a quote.' },
-          ]}/>
+          <FAQAccordion items={cabFaqs}/>
         </Section>
 
       </main>
       <Footer/>
     </RevealProvider>
+    </>
   )
 }

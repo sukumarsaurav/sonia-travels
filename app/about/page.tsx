@@ -1,9 +1,23 @@
+import type { Metadata } from 'next'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Section } from '@/components/ui/Section'
 import { Testimonials } from '@/components/home/Testimonials'
 import { FAQSection } from '@/components/home/FAQ'
 import { RevealProvider } from '@/components/ui/Reveal'
+
+export const metadata: Metadata = {
+  title: 'About Us | Sonia Tour & Travels — Travel Agency in Pathankot Since 2008',
+  description: 'Sonia Tour & Travels has served 10,000+ travellers from Pathankot since 2008. Learn about our team, values and why we are the most trusted travel agency in Pathankot.',
+  keywords: 'about sonia travels pathankot, travel agency pathankot, trusted travel agent pathankot, sonia tour travels, pathankot travel company',
+  openGraph: {
+    title: 'About Sonia Tour & Travels — Pathankot\'s Trusted Travel Agency Since 2008',
+    description: 'Learn about 18 years of travel experience, 10,000+ satisfied customers and what makes us Pathankot\'s most trusted travel desk.',
+    url: 'https://soniatravels.in/about',
+    type: 'website',
+  },
+  alternates: { canonical: 'https://soniatravels.in/about' },
+}
 
 export default function AboutPage() {
   return (

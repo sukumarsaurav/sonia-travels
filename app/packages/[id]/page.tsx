@@ -10,9 +10,31 @@ import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { createServerSupabase } from '@/lib/supabase-server'
 import { createClient } from '@supabase/supabase-js'
+import type { Metadata } from 'next'
 import type { Package, ItineraryDay } from '@/types'
+import { PackageSchema } from '@/components/seo/JsonLd'
 
 export const revalidate = 60
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+  const { data } = await supabase.from('packages').select('name,description,desc,price,nights,days,region').eq('id', id).single()
+  if (!data) return { title: 'Package not found' }
+  const pkg = data as Package
+  const title = `${pkg.name} Tour Package | ${pkg.days}D${pkg.nights}N from ₹${pkg.price.toLocaleString('en-IN')}/pax | Sonia Travels`
+  const description = `Book ${pkg.name} tour package from Pathankot — ${pkg.nights} nights, ${pkg.days} days. Includes private AC vehicle, 3-star stay & daily breakfast. From ₹${pkg.price.toLocaleString('en-IN')} per person.`
+  return {
+    title,
+    description,
+    keywords: `${pkg.name.toLowerCase()} tour package, ${pkg.region.toLowerCase()} tour, ${pkg.name.toLowerCase()} trip from pathankot, travel packages pathankot`,
+    openGraph: { title, description, url: `https://soniatravels.in/packages/${id}`, type: 'website' },
+    alternates: { canonical: `https://soniatravels.in/packages/${id}` },
+  }
+}
 
 export async function generateStaticParams() {
   // generateStaticParams runs at build time — cannot use cookies()
@@ -65,6 +87,8 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
   const exclusions = pkg.exclusions?.length ? pkg.exclusions : DEFAULT_EXCLUSIONS
 
   return (
+    <>
+      <PackageSchema pkg={pkg}/>
     <RevealProvider>
       <Navbar/>
       <main className="has-mobile-bar">
@@ -214,5 +238,6 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
 
       <Footer/>
     </RevealProvider>
+    </>
   )
 }

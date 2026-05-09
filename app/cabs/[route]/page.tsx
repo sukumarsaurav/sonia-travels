@@ -7,6 +7,7 @@ import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
 import { CAB_ROUTES, VEHICLE_TYPES } from '../data'
+import { CabServiceSchema } from '@/components/seo/JsonLd'
 
 export async function generateStaticParams() {
   return CAB_ROUTES.map(r => ({ route: r.slug }))
@@ -19,8 +20,9 @@ export async function generateMetadata({ params }: { params: Promise<{ route: st
   return {
     title: r.seoTitle,
     description: r.seoDesc,
-    keywords: `${r.from.toLowerCase()} to ${r.to.toLowerCase()} cab, ${r.from.toLowerCase()} to ${r.to.toLowerCase()} taxi, cab from ${r.from.toLowerCase()}, taxi ${r.to.toLowerCase()}, outstation cab pathankot`,
-    openGraph: { title: r.seoTitle, description: r.seoDesc, type: 'website' },
+    keywords: `${r.from.toLowerCase()} to ${r.to.toLowerCase()} cab, ${r.from.toLowerCase()} to ${r.to.toLowerCase()} taxi, cab from ${r.from.toLowerCase()}, taxi ${r.to.toLowerCase()}, outstation cab pathankot, cab service pathankot`,
+    openGraph: { title: r.seoTitle, description: r.seoDesc, type: 'website', url: `https://soniatravels.in/cabs/${r.slug}` },
+    alternates: { canonical: `https://soniatravels.in/cabs/${r.slug}` },
   }
 }
 
@@ -35,6 +37,8 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
   const related = CAB_ROUTES.filter(c => c.slug !== r.slug && c.popular).slice(0, 3)
 
   return (
+    <>
+      <CabServiceSchema route={r}/>
     <RevealProvider>
       <Navbar/>
       <main className="has-mobile-bar">
@@ -233,5 +237,6 @@ export default async function CabRoutePage({ params }: { params: Promise<{ route
 
       <Footer/>
     </RevealProvider>
+    </>
   )
 }
