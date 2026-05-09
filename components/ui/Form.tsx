@@ -7,12 +7,13 @@ const inputStyle: React.CSSProperties = {
   background: 'white', fontSize: 14, color: 'var(--ink-900)', outline: 'none',
 }
 
-export function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
+export function Field({ label, children, hint, error }: { label: string; children: React.ReactNode; hint?: string; error?: string }) {
   return (
     <label style={{ display: 'block' }}>
-      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-700)', marginBottom: 6, letterSpacing: '0.02em' }}>{label}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: error ? 'var(--terra-700)' : 'var(--ink-700)', marginBottom: 6, letterSpacing: '0.02em' }}>{label}</div>
       {children}
-      {hint && <div style={{ fontSize: 11, color: 'var(--ink-600)', marginTop: 4 }}>{hint}</div>}
+      {error && <div style={{ fontSize: 11, color: 'var(--terra-700)', marginTop: 4 }}>{error}</div>}
+      {!error && hint && <div style={{ fontSize: 11, color: 'var(--ink-600)', marginTop: 4 }}>{hint}</div>}
     </label>
   )
 }

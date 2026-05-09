@@ -14,13 +14,26 @@ function nextMonthValue() {
   return d.toISOString().slice(0, 7) // "YYYY-MM"
 }
 
+// Indian mobile: optional +91/0 prefix, then 10 digits starting 6-9
+const PHONE_RE = /^(\+91|0)?[6-9]\d{9}$/
+
 export function ContactSection() {
   const [form, setForm] = useState({ name: '', phone: '', destination: '', travelers: '2', dates: nextMonthValue(), notes: '' })
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [formErrors, setFormErrors] = useState<{ phone?: string; destination?: string }>({})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (status === 'sending') return
+
+    // M1: phone format validation
+    // M3: destination required
+    const errs: { phone?: string; destination?: string } = {}
+    if (!PHONE_RE.test(form.phone.replace(/\s/g, ''))) errs.phone = 'Enter a valid 10-digit Indian mobile number.'
+    if (!form.destination) errs.destination = 'Please pick a destination.'
+    if (Object.keys(errs).length) { setFormErrors(errs); return }
+    setFormErrors({})
+
     setStatus('sending')
     try {
       const { error } = await supabase.from('inquiries').insert({
@@ -78,11 +91,15 @@ export function ContactSection() {
             ) : (
               <div style={{ display: 'grid', gap: 16 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                  <Field label="Your name"><Input placeholder="Full name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required/></Field>
-                  <Field label="Phone"><Input placeholder="+91 …" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} required/></Field>
+                  <Field label="Your name">
+                    <Input placeholder="Full name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required/>
+                  </Field>
+                  <Field label="Phone" error={formErrors.phone}>
+                    <Input placeholder="+91 98XXXXXXXX" value={form.phone} onChange={e => { setForm(f => ({ ...f, phone: e.target.value })); setFormErrors(fe => ({ ...fe, phone: '' })) }} required/>
+                  </Field>
                 </div>
-                <Field label="Where to?">
-                  <Select value={form.destination} onChange={e => setForm(f => ({ ...f, destination: e.target.value }))}>
+                <Field label="Where to?" error={formErrors.destination}>
+                  <Select value={form.destination} onChange={e => { setForm(f => ({ ...f, destination: e.target.value })); setFormErrors(fe => ({ ...fe, destination: '' })) }} required>
                     <option value="" disabled>Pick a destination</option>
                     {PACKAGES.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
                     <option>Other / not sure</option>

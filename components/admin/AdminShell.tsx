@@ -52,11 +52,14 @@ const fmtDateTime = (d: string) =>
 const waLink = (phone: string, text: string) =>
   `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`
 
-async function nextBookingRef(supabase: ReturnType<typeof createBrowserSupabase>) {
-  const { data } = await supabase.from('bookings').select('booking_ref').order('created_at', { ascending: false }).limit(1)
-  const last = data?.[0]?.booking_ref
-  const num = last ? parseInt(last.replace('STT-', ''), 10) + 1 : 2001
-  return `STT-${num}`
+// Collision-resistant booking ref: BK + YYMMDD + 4-digit random
+// Does not rely on reading the last row — safe under concurrent inserts
+function generateBookingRef(): string {
+  const now = new Date()
+  const pad = (n: number, l = 2) => String(n).padStart(l, '0')
+  const date = `${String(now.getFullYear()).slice(2)}${pad(now.getMonth() + 1)}${pad(now.getDate())}`
+  const rand = Math.floor(Math.random() * 9000) + 1000
+  return `BK${date}${rand}`
 }
 
 function exportCSV(rows: DBBooking[]) {
@@ -822,7 +825,7 @@ function NewBookingModal({ open, onClose, onSaved, prefill }: NewBookingModalPro
   const submit = async () => {
     if (!form.name || !form.phone || !form.pkgName) { setError('Name, phone and package are required.'); return }
     setSaving(true); setError('')
-    const ref = await nextBookingRef(supabase)
+    const ref = generateBookingRef()
     const { error: err } = await supabase.from('bookings').insert({
       booking_ref: ref,
       customer_name: form.name,

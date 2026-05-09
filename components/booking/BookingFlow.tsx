@@ -5,6 +5,7 @@ import { Field, Input, Textarea } from '@/components/ui/Form'
 import { Ic } from '@/components/ui/Icons'
 import { PACKAGES, formatINR } from '@/lib/data'
 import { supabase } from '@/lib/supabase'
+import { createBrowserSupabase } from '@/lib/supabase-browser'
 import type { Package } from '@/types'
 
 interface Props { pkgId: string; onClose: () => void; onComplete?: () => void }
@@ -28,30 +29,84 @@ function Row({ k, v }: { k: string; v: string }) {
   )
 }
 
+// Extend window to hold Razorpay constructor loaded from CDN
+declare global { interface Window { Razorpay: any } }
+
 function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg: Package; data: any; onComplete?: () => void }) {
-  const [method, setMethod] = useState('upi')
   const [processing, setProcessing] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [payError, setPayError] = useState('')
 
   const handlePay = async () => {
     if (processing) return
     setProcessing(true)
+    setPayError('')
     try {
-      // Generate a collision-resistant booking ID using timestamp + random suffix
-      const bookingId = 'STT-' + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).toUpperCase().slice(2, 5)
-      const { error } = await supabase.from('bookings').insert({
-        booking_id: bookingId,
-        customer: data.name, phone: data.phone, email: data.email,
-        package: pkg.name, travelers: data.travelers,
-        depart: data.depart, amount: total,
-        status: 'Pending', payment: `Razorpay · ${method.toUpperCase()}`,
-        room: data.room, notes: data.notes || '',
+      // 1. Create Razorpay order server-side
+      const orderRes = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, receipt: `STT-${Date.now().toString(36).toUpperCase()}` }),
       })
-      if (error) throw error
+      const { orderId, error: orderErr } = await orderRes.json()
+      if (orderErr) throw new Error(orderErr)
+
+      // 2. Load Razorpay checkout.js if not already loaded
+      if (!window.Razorpay) {
+        await new Promise<void>((resolve, reject) => {
+          const s = document.createElement('script')
+          s.src = 'https://checkout.razorpay.com/v1/checkout.js'
+          s.onload = () => resolve()
+          s.onerror = () => reject(new Error('Failed to load payment gateway'))
+          document.body.appendChild(s)
+        })
+      }
+
+      // 3. Open Razorpay modal and wait for payment
+      await new Promise<void>((resolve, reject) => {
+        const rzp = new window.Razorpay({
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: total * 100,
+          currency: 'INR',
+          order_id: orderId,
+          name: 'Sonia Tour & Travels',
+          description: pkg.name,
+          prefill: { name: data.name, email: data.email, contact: data.phone },
+          theme: { color: '#b04a2f' },
+          handler: async (response: any) => {
+            // 4. Verify signature server-side
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(response),
+            })
+            const { verified, error: verifyErr } = await verifyRes.json()
+            if (!verified) { reject(new Error(verifyErr || 'Payment verification failed')); return }
+
+            // 5. Record confirmed booking in DB
+            const bookingId = 'STT-' + Date.now().toString(36).toUpperCase().slice(-4) + Math.random().toString(36).toUpperCase().slice(2, 5)
+            const { error: dbErr } = await supabase.from('bookings').insert({
+              booking_id: bookingId,
+              customer: data.name, phone: data.phone, email: data.email,
+              package: pkg.name, travelers: data.travelers,
+              depart: data.depart, amount: total,
+              status: 'Confirmed',
+              payment: `Razorpay · ${response.razorpay_payment_id}`,
+              room: data.room, notes: data.notes || '',
+            })
+            if (dbErr) { reject(new Error(dbErr.message)); return }
+            resolve()
+          },
+          modal: { ondismiss: () => reject(new Error('cancelled')) },
+        })
+        rzp.open()
+      })
+
       setSuccess(true)
-    } catch {
-      // On error, keep form open — don't silently fail
-      alert('Booking could not be saved. Please WhatsApp us on +91 84602 22809 to confirm.')
+    } catch (err: any) {
+      if (err.message !== 'cancelled') {
+        setPayError('Payment failed. Please try again or WhatsApp us on +91 84602 22809.')
+      }
     } finally {
       setProcessing(false)
     }
@@ -62,49 +117,32 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
       <div style={{ width: 72, height: 72, borderRadius: 99, background: 'var(--forest-100)', color: 'var(--forest-700)', display: 'grid', placeItems: 'center', margin: '0 auto 20px' }}>
         <Ic.check s={36}/>
       </div>
-      <h3 style={{ fontFamily: 'var(--serif)', fontSize: 32, margin: '0 0 8px', fontWeight: 500 }}>Booking confirmed</h3>
-      <div style={{ color: 'var(--ink-600)', marginBottom: 24 }}>We'll send your itinerary on WhatsApp & email.</div>
+      <h3 style={{ fontFamily: 'var(--serif)', fontSize: 32, margin: '0 0 8px', fontWeight: 500 }}>Booking confirmed!</h3>
+      <div style={{ color: 'var(--ink-600)', marginBottom: 24 }}>We'll send your itinerary on WhatsApp & email within the hour.</div>
       <Btn variant="dark" onClick={onComplete}>Done</Btn>
     </div>
   )
 
   return (
-    <div>
-      <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 12, overflow: 'hidden' }}>
-        <div style={{ background: '#0d2366', color: 'white', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: 'white', color: '#0d2366', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 16 }}>R</div>
-            <div><div style={{ fontSize: 12, opacity: 0.8 }}>Sonia Tour & Travels</div></div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, opacity: 0.7 }}>Amount</div>
-            <div style={{ fontSize: 18, fontWeight: 700 }}>{formatINR(total)}</div>
-          </div>
-        </div>
-        <div style={{ padding: 20 }}>
-          <div className="rzp-grid" style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: 20 }}>
-            <div style={{ display: 'grid', gap: 4 }}>
-              {[{k:'upi',l:'UPI',sub:'GPay, PhonePe, BHIM'},{k:'card',l:'Cards',sub:'Visa, Mastercard'},{k:'netbanking',l:'Net Banking',sub:'All major banks'},{k:'wallet',l:'Wallets',sub:'Paytm, Mobikwik'},{k:'emi',l:'EMI',sub:`From ${formatINR(Math.round(total/3))}/mo`}].map(m => (
-                <button key={m.k} onClick={() => setMethod(m.k)} style={{ padding: '10px 12px', borderRadius: 8, textAlign: 'left', background: method === m.k ? '#eef1f9' : 'transparent', border: method === m.k ? '1px solid #0d2366' : '1px solid transparent' }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: '#0d2366' }}>{m.l}</div>
-                  <div style={{ fontSize: 11, color: 'var(--ink-600)' }}>{m.sub}</div>
-                </button>
-              ))}
-            </div>
-            <div style={{ borderLeft: '1px solid var(--line)', paddingLeft: 20, minHeight: 180 }}>
-              {method === 'upi' && <div><div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Pay using UPI</div><Field label="UPI ID"><Input placeholder="yourname@okaxis"/></Field></div>}
-              {method === 'card' && <div><div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Card details</div><Field label="Card number"><Input placeholder="1234 5678 9012 3456"/></Field></div>}
-              {method === 'netbanking' && <div><div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Choose your bank</div><div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>{['HDFC Bank','ICICI Bank','SBI','Axis Bank'].map(b => <button key={b} style={{ padding: 10, border: '1px solid var(--line)', borderRadius: 6, textAlign: 'left', background: 'white', fontSize: 13 }}>{b}</button>)}</div></div>}
-              {method === 'wallet' && <div><div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Wallets</div><div style={{ display: 'grid', gap: 8 }}>{['Paytm','Mobikwik','Amazon Pay'].map(w => <button key={w} style={{ padding: 12, border: '1px solid var(--line)', borderRadius: 6, textAlign: 'left', background: 'white', fontSize: 13, fontWeight: 500 }}>{w}</button>)}</div></div>}
-              {method === 'emi' && <div><div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>EMI plans</div><div style={{ display: 'grid', gap: 6 }}>{[3,6,9,12].map(m => <div key={m} style={{ padding: 12, border: '1px solid var(--line)', borderRadius: 6, display: 'flex', justifyContent: 'space-between', fontSize: 13 }}><span>{m} months</span><span style={{ fontWeight: 600 }}>{formatINR(Math.round(total/m*1.05))}/mo</span></div>)}</div></div>}
-            </div>
-          </div>
-        </div>
-        <div style={{ padding: '14px 20px', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--sand-50)' }}>
-          <div style={{ fontSize: 11, color: 'var(--ink-600)', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>SECURED BY RAZORPAY</div>
-          <Btn variant="razorpay" onClick={handlePay}>{processing ? 'Processing…' : `Pay ${formatINR(total)}`}</Btn>
-        </div>
+    <div style={{ display: 'grid', gap: 16 }}>
+      {/* Summary card before paying */}
+      <div style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 12, padding: 20 }}>
+        <div style={{ fontSize: 13, color: 'var(--ink-600)', marginBottom: 12 }}>You're about to pay</div>
+        <div style={{ fontFamily: 'var(--serif)', fontSize: 36, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--ink-900)' }}>{formatINR(total)}</div>
+        <div style={{ fontSize: 13, color: 'var(--ink-600)', marginTop: 4 }}>{pkg.name} · {data.travelers} traveller{data.travelers > 1 ? 's' : ''} · {new Date(data.depart).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
       </div>
+
+      {payError && (
+        <div style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', padding: '12px 16px', borderRadius: 8, fontSize: 13 }}>{payError}</div>
+      )}
+
+      <div style={{ padding: 16, background: 'var(--sand-100)', borderRadius: 10, fontSize: 12, color: 'var(--ink-600)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Ic.shield s={14}/> You'll be taken to Razorpay's secure checkout. Pay via UPI, card, netbanking or wallet.
+      </div>
+
+      <Btn variant="razorpay" full onClick={handlePay} disabled={processing}>
+        {processing ? 'Opening payment gateway…' : `Pay ${formatINR(total)} securely`}
+      </Btn>
     </div>
   )
 }
@@ -116,18 +154,54 @@ function defaultDepart() {
   return d.toISOString().split('T')[0]
 }
 
+// Validate Indian mobile: optional +91/0 prefix then 10 digits starting 6-9
+const PHONE_RE = /^(\+91|0)?[6-9]\d{9}$/
+
 export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
-  const pkg = PACKAGES.find(p => p.id === pkgId) || PACKAGES[0]
+  // H1: load package from Supabase; fall back to static data while loading
+  const [pkg, setPkg] = useState<Package>(PACKAGES.find(p => p.id === pkgId) ?? PACKAGES[0])
+  useEffect(() => {
+    const db = createBrowserSupabase()
+    db.from('packages').select('*').eq('id', pkgId).single().then(({ data }) => {
+      if (data) setPkg(data as Package)
+    })
+  }, [pkgId])
+
   const [step, setStep] = useState(0)
-  const [data, setData] = useState({ travelers: 2, depart: defaultDepart(), room: 'twin', name: '', email: '', phone: '', notes: '', addons: { insurance: true, photo: false, airport: true } })
-  const setD = (k: string, v: any) => setData(d => ({ ...d, [k]: v }))
+  // H3: all add-ons default OFF — user must actively choose
+  const [data, setData] = useState({ travelers: 2, depart: defaultDepart(), room: 'twin', name: '', email: '', phone: '', notes: '', addons: { insurance: false, photo: false, airport: false } })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const setD = (k: string, v: any) => { setData(d => ({ ...d, [k]: v })); setErrors(e => ({ ...e, [k]: '' })) }
   const toggleAddon = (k: string) => setData(d => ({ ...d, addons: { ...d.addons, [k]: !d.addons[k as keyof typeof d.addons] } }))
 
-  // Close on Escape key
+  // C3: validate each step before allowing Next
+  const today = new Date().toISOString().split('T')[0]
+  const validate = (s: number): boolean => {
+    const errs: Record<string, string> = {}
+    if (s === 0) {
+      if (!data.depart || data.depart < today) errs.depart = 'Please choose a future departure date.'
+    }
+    if (s === 1) {
+      if (!data.name.trim() || data.name.trim().length < 2) errs.name = 'Please enter your full name.'
+      if (!PHONE_RE.test(data.phone.replace(/\s/g, ''))) errs.phone = 'Enter a valid 10-digit Indian mobile number.'
+    }
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
+  const goNext = () => { if (validate(step)) setStep(s => s + 1) }
+
+  // Close on Escape key + lock body scroll while open
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
+    // L2: prevent background scroll
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', handler)
+      document.body.style.overflow = prev
+    }
   }, [onClose])
 
   const addonPrices = { insurance: 600, photo: 2400, airport: 1200 }
@@ -152,7 +226,10 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
 
           {step === 0 && (
             <div style={{ display: 'grid', gap: 18 }}>
-              <Field label="Departure date"><Input type="date" value={data.depart} onChange={e => setD('depart', e.target.value)}/></Field>
+              <Field label="Departure date" error={errors.depart}>
+                {/* C4: min prevents past date selection */}
+                <Input type="date" min={today} value={data.depart} onChange={e => setD('depart', e.target.value)}/>
+              </Field>
               <Field label="Number of travellers">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', border: '1px solid var(--line)', borderRadius: 8, background: 'white', justifyContent: 'space-between' }}>
                   <div><div style={{ fontWeight: 600 }}>Adults</div><div style={{ fontSize: 12, color: 'var(--ink-600)' }}>{formatINR(pkg.price)} per person</div></div>
@@ -176,12 +253,20 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
           )}
           {step === 1 && (
             <div style={{ display: 'grid', gap: 18 }}>
-              <Field label="Lead traveller name"><Input placeholder="Full name as on ID" value={data.name} onChange={e => setD('name', e.target.value)}/></Field>
+              <Field label="Lead traveller name" error={errors.name}>
+                <Input placeholder="Full name as on ID" value={data.name} onChange={e => setD('name', e.target.value)}/>
+              </Field>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <Field label="Email"><Input type="email" placeholder="you@example.com" value={data.email} onChange={e => setD('email', e.target.value)}/></Field>
-                <Field label="Phone (WhatsApp)"><Input placeholder="+91 …" value={data.phone} onChange={e => setD('phone', e.target.value)}/></Field>
+                <Field label="Email">
+                  <Input type="email" placeholder="you@example.com" value={data.email} onChange={e => setD('email', e.target.value)}/>
+                </Field>
+                <Field label="Phone (WhatsApp)" error={errors.phone}>
+                  <Input placeholder="+91 98XXXXXXXX" value={data.phone} onChange={e => setD('phone', e.target.value)}/>
+                </Field>
               </div>
-              <Field label="Special requests (optional)"><Textarea placeholder="Vegetarian only, parents along, anniversary, etc." value={data.notes} onChange={e => setD('notes', e.target.value)}/></Field>
+              <Field label="Special requests (optional)">
+                <Textarea placeholder="Vegetarian only, parents along, anniversary, etc." value={data.notes} onChange={e => setD('notes', e.target.value)}/>
+              </Field>
             </div>
           )}
           {step === 2 && (
@@ -205,7 +290,7 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
           {step < 3 && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--line)' }}>
               <Btn variant="ghost" onClick={step === 0 ? onClose : () => setStep(s => s-1)}>{step === 0 ? 'Cancel' : 'Back'}</Btn>
-              <Btn variant="dark" onClick={() => setStep(s => s+1)} icon={<Ic.arrow s={14}/>}>{step === 2 ? `Pay ${formatINR(total)}` : 'Continue'}</Btn>
+              <Btn variant="dark" onClick={goNext} icon={<Ic.arrow s={14}/>}>{step === 2 ? `Pay ${formatINR(total)}` : 'Continue'}</Btn>
             </div>
           )}
         </div>

@@ -34,12 +34,21 @@ function ProfileTab({ user }: { user: UserInfo }) {
   const [phone, setPhone] = useState(user.phone)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   const save = async () => {
-    setSaving(true)
-    await supabase.from('user_profiles').update({ full_name: name, phone, updated_at: new Date().toISOString() }).eq('id', user.id)
-    setSaving(false); setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
+    setSaving(true); setSaveError('')
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({ full_name: name, phone, updated_at: new Date().toISOString() })
+      .eq('id', user.id)
+    setSaving(false)
+    if (error) {
+      setSaveError('Could not save changes. Please try again.')
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    }
   }
 
   const logout = async () => {
@@ -66,6 +75,9 @@ function ProfileTab({ user }: { user: UserInfo }) {
           <Field label="Full name"><Input value={name} onChange={e => setName(e.target.value)} placeholder="Your full name"/></Field>
           <Field label="Email"><Input value={user.email} readOnly style={{ color: 'var(--ink-400)', cursor: 'not-allowed' }}/></Field>
           <Field label="Phone number"><Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 …"/></Field>
+          {saveError && (
+            <div style={{ fontSize: 13, color: 'var(--terra-700)', padding: '8px 12px', background: 'var(--terra-100)', borderRadius: 6 }}>{saveError}</div>
+          )}
           <div style={{ display: 'flex', gap: 10 }}>
             <Btn variant="dark" size="md" onClick={save} disabled={saving}>{saving ? 'Saving…' : saved ? '✓ Saved' : 'Save changes'}</Btn>
           </div>
