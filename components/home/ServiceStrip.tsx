@@ -23,7 +23,7 @@ export function ServiceStrip() {
                 <Icon s={20}/>
               </div>
               <div style={{ fontWeight: 600, marginBottom: 2 }}>{s.label}</div>
-              <div style={{ fontSize: 12, color: 'var(--ink-500)' }}>{s.sub}</div>
+              <div style={{ fontSize: 12, color: 'var(--ink-600)' }}>{s.sub}</div>
             </div>
           )
         })}

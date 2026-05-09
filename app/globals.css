@@ -8,22 +8,24 @@
   --sand-400: #b89a6e;
   --ink-900: #1a1814;
   --ink-700: #3a342b;
+  --ink-600: #524940;   /* WCAG AA compliant on --sand-50 */
   --ink-500: #6b6258;
   --ink-300: #9a9085;
   --terra-600: #b04a2f;
   --terra-700: #8e3a23;
+  --terra-800: #6e2b18;
   --terra-100: #f5e2d8;
   --forest-700: #2d4a3a;
   --forest-600: #3a6049;
   --forest-100: #dde7e0;
   --gold-500: #c79849;
+  --gold-400: #d4aa63;
   --line: #e6dccb;
   --shadow-sm: 0 1px 2px rgba(26,24,20,0.04), 0 1px 1px rgba(26,24,20,0.03);
   --shadow-md: 0 8px 24px -8px rgba(26,24,20,0.12), 0 4px 8px -4px rgba(26,24,20,0.06);
   --shadow-lg: 0 24px 48px -12px rgba(26,24,20,0.18);
-  --serif: "Fraunces", Georgia, serif;
-  --sans: "Inter", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
+  /* --serif, --sans, --mono injected by next/font via html className */
+  --focus-ring: 0 0 0 3px rgba(142, 58, 35, 0.35);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -39,6 +41,31 @@ body {
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 a { color: inherit; text-decoration: none; }
 input, select, textarea { font-family: inherit; font-size: inherit; }
+
+/* ── Focus styles — keyboard navigation ── */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--terra-600);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Buttons and interactive elements get a shadow-based ring for better visibility */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--terra-600);
+  outline-offset: 3px;
+  box-shadow: var(--focus-ring);
+}
+/* Inputs keep a visible border change */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--terra-600);
+  outline-offset: 0;
+  border-color: var(--terra-600) !important;
+  box-shadow: 0 0 0 3px rgba(142,58,35,0.15);
+}
 
 /* Placeholder image blocks */
 .ph-img {
@@ -113,8 +140,14 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     border-bottom: 1px solid var(--line);
     gap: 4px !important; z-index: 49;
   }
+  /* active link style in mobile menu */
+  .nav-links.open a[aria-current="page"] {
+    color: var(--terra-700) !important;
+    font-weight: 600;
+  }
   .nav-toggle { display: grid !important; }
   .nav-admin-cta { display: none !important; }
+  .nav-wa-mobile { display: flex !important; }
   .hero-grid { grid-template-columns: 1fr !important; }
   .hero-collage { display: none !important; }
   .grid-3 { grid-template-columns: 1fr 1fr !important; }
@@ -131,13 +164,25 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   .services-row { grid-template-columns: 1fr !important; }
   .pkg-detail-grid { grid-template-columns: 1fr !important; }
   .admin-row-2 { grid-template-columns: 1fr !important; }
+  .mobile-book-bar { display: flex !important; }
+  .has-mobile-bar { padding-bottom: 80px; }
+}
+@media (max-width: 768px) {
+  .featured-grid { grid-template-columns: 1fr !important; }
+  .featured-grid .ph-img { min-height: 240px !important; }
 }
 @media (max-width: 640px) {
   .grid-3 { grid-template-columns: 1fr !important; }
   .grid-6 { grid-template-columns: repeat(2,1fr) !important; }
   .footer-grid { grid-template-columns: 1fr !important; }
-  .hero-h1 { font-size: 52px !important; }
-  .section-h2 { font-size: 32px !important; }
+  .hero-h1 { font-size: 48px !important; line-height: 1 !important; }
+  .section-h2 { font-size: 30px !important; }
+  .page-hero-h1 { font-size: 36px !important; line-height: 1.1 !important; }
+  .pkg-hero-h1 { font-size: 36px !important; line-height: 1 !important; }
+  .cabs-stats { gap: 20px !important; flex-wrap: wrap !important; }
+  .hero-search { grid-template-columns: 1fr !important; }
+  .hero-search label { border-right: none !important; border-bottom: 1px solid var(--line); }
+  .hero-search label:last-of-type { border-bottom: none !important; }
   .admin-stat-grid { grid-template-columns: 1fr 1fr !important; }
   .booking-modal { grid-template-columns: 1fr !important; }
   .booking-aside { display: none !important; }

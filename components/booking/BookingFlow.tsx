@@ -53,7 +53,7 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
         <Ic.check s={36}/>
       </div>
       <h3 style={{ fontFamily: 'var(--serif)', fontSize: 32, margin: '0 0 8px', fontWeight: 500 }}>Booking confirmed</h3>
-      <div style={{ color: 'var(--ink-500)', marginBottom: 24 }}>We'll send your itinerary on WhatsApp & email.</div>
+      <div style={{ color: 'var(--ink-600)', marginBottom: 24 }}>We'll send your itinerary on WhatsApp & email.</div>
       <Btn variant="dark" onClick={onComplete}>Done</Btn>
     </div>
   )
@@ -77,7 +77,7 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
               {[{k:'upi',l:'UPI',sub:'GPay, PhonePe, BHIM'},{k:'card',l:'Cards',sub:'Visa, Mastercard'},{k:'netbanking',l:'Net Banking',sub:'All major banks'},{k:'wallet',l:'Wallets',sub:'Paytm, Mobikwik'},{k:'emi',l:'EMI',sub:`From ${formatINR(Math.round(total/3))}/mo`}].map(m => (
                 <button key={m.k} onClick={() => setMethod(m.k)} style={{ padding: '10px 12px', borderRadius: 8, textAlign: 'left', background: method === m.k ? '#eef1f9' : 'transparent', border: method === m.k ? '1px solid #0d2366' : '1px solid transparent' }}>
                   <div style={{ fontWeight: 600, fontSize: 13, color: '#0d2366' }}>{m.l}</div>
-                  <div style={{ fontSize: 11, color: 'var(--ink-500)' }}>{m.sub}</div>
+                  <div style={{ fontSize: 11, color: 'var(--ink-600)' }}>{m.sub}</div>
                 </button>
               ))}
             </div>
@@ -91,7 +91,7 @@ function RazorpayCheckout({ total, pkg, data, onComplete }: { total: number; pkg
           </div>
         </div>
         <div style={{ padding: '14px 20px', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--sand-50)' }}>
-          <div style={{ fontSize: 11, color: 'var(--ink-500)', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>SECURED BY RAZORPAY</div>
+          <div style={{ fontSize: 11, color: 'var(--ink-600)', fontFamily: 'var(--mono)', letterSpacing: '0.06em' }}>SECURED BY RAZORPAY</div>
           <Btn variant="razorpay" onClick={handlePay}>{processing ? 'Processing…' : `Pay ${formatINR(total)}`}</Btn>
         </div>
       </div>
@@ -131,7 +131,7 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
               <Field label="Departure date"><Input type="date" value={data.depart} onChange={e => setD('depart', e.target.value)}/></Field>
               <Field label="Number of travellers">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 12px', border: '1px solid var(--line)', borderRadius: 8, background: 'white', justifyContent: 'space-between' }}>
-                  <div><div style={{ fontWeight: 600 }}>Adults</div><div style={{ fontSize: 12, color: 'var(--ink-500)' }}>{formatINR(pkg.price)} per person</div></div>
+                  <div><div style={{ fontWeight: 600 }}>Adults</div><div style={{ fontSize: 12, color: 'var(--ink-600)' }}>{formatINR(pkg.price)} per person</div></div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <button onClick={() => setD('travelers', Math.max(1, data.travelers-1))} style={{ width: 32, height: 32, borderRadius: 99, border: '1px solid var(--line)', display: 'grid', placeItems: 'center' }}><Ic.minus s={14}/></button>
                     <div style={{ width: 32, textAlign: 'center', fontWeight: 600 }}>{data.travelers}</div>
@@ -162,14 +162,14 @@ export function BookingFlow({ pkgId, onClose, onComplete }: Props) {
           )}
           {step === 2 && (
             <div style={{ display: 'grid', gap: 14 }}>
-              <div style={{ fontSize: 13, color: 'var(--ink-500)', marginBottom: -4 }}>Optional add-ons (per traveller)</div>
+              <div style={{ fontSize: 13, color: 'var(--ink-600)', marginBottom: -4 }}>Optional add-ons (per traveller)</div>
               {[{k:'insurance',t:'Travel insurance',d:'Trip cancellation, baggage & medical cover',p:600},{k:'photo',t:'Photographer day',d:'Professional shoot, edited photos in 7 days',p:2400},{k:'airport',t:'Airport pickup & drop',d:'Private vehicle, both ways',p:1200}].map(a => (
                 <button key={a.k} onClick={() => toggleAddon(a.k)} style={{ padding: 16, borderRadius: 10, textAlign: 'left', border: data.addons[a.k as keyof typeof data.addons] ? '1.5px solid var(--terra-600)' : '1px solid var(--line)', background: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
                   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                     <div style={{ width: 22, height: 22, borderRadius: 6, background: data.addons[a.k as keyof typeof data.addons] ? 'var(--terra-600)' : 'white', border: data.addons[a.k as keyof typeof data.addons] ? '1px solid var(--terra-700)' : '1.5px solid var(--sand-300)', display: 'grid', placeItems: 'center', color: 'white' }}>
                       {data.addons[a.k as keyof typeof data.addons] && <Ic.check s={14}/>}
                     </div>
-                    <div><div style={{ fontWeight: 600 }}>{a.t}</div><div style={{ fontSize: 12, color: 'var(--ink-500)' }}>{a.d}</div></div>
+                    <div><div style={{ fontWeight: 600 }}>{a.t}</div><div style={{ fontSize: 12, color: 'var(--ink-600)' }}>{a.d}</div></div>
                   </div>
                   <div style={{ fontWeight: 600 }}>+{formatINR(a.p)}</div>
                 </button>

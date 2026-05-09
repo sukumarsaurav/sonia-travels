@@ -25,7 +25,7 @@ export function Splash() {
           <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 600, color: 'var(--ink-900)', letterSpacing: '-0.01em' }}>
             Sonia <span style={{ fontStyle: 'italic', color: 'var(--terra-700)' }}>Travels</span>
           </div>
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.22em', color: 'var(--ink-500)', textTransform: 'uppercase', marginTop: 4 }}>
+          <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.22em', color: 'var(--ink-600)', textTransform: 'uppercase', marginTop: 4 }}>
             Loading your trip…
           </div>
         </div>

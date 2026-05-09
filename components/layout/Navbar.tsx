@@ -56,7 +56,7 @@ function UserMenu({ user }: { user: User }) {
         <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 8px)', background: 'white', border: '1px solid var(--line)', borderRadius: 12, boxShadow: '0 12px 32px -8px rgba(26,24,20,0.16)', minWidth: 200, zIndex: 100, overflow: 'hidden' }}>
           <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--line)', background: 'var(--sand-50)' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-900)' }}>{name}</div>
-            <div style={{ fontSize: 11, color: 'var(--ink-500)', marginTop: 2 }}>{user.email}</div>
+            <div style={{ fontSize: 11, color: 'var(--ink-600)', marginTop: 2 }}>{user.email}</div>
           </div>
           <Link href="/account" onClick={() => setOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', fontSize: 14, color: 'var(--ink-700)', borderBottom: '1px solid var(--line)' }}>
             <Ic.cal s={15}/> My Bookings
@@ -114,7 +114,15 @@ export function Navbar() {
           </Btn>
         </div>
 
-        <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label="Menu"
+        {/* WhatsApp icon-only — visible on mobile where nav-admin-cta is hidden */}
+        <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer"
+          aria-label="Chat on WhatsApp"
+          className="nav-wa-mobile"
+          style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: 8, background: '#25D366', color: 'white', flexShrink: 0 }}>
+          <Ic.whatsapp s={20}/>
+        </a>
+
+        <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}
           style={{ width: 40, height: 40, borderRadius: 8, border: '1px solid var(--line)', background: 'white', display: 'none', placeItems: 'center' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             {open ? <g><path d="M6 6L18 18"/><path d="M6 18L18 6"/></g> : <g><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/></g>}

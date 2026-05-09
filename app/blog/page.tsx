@@ -34,7 +34,7 @@ export default function BlogPage() {
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.18em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 16 }}>
               Travel Blog
             </div>
-            <h1 style={{ fontFamily: 'var(--serif)', fontSize: 64, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.03em', margin: '0 0 16px', maxWidth: 600 }}>
+            <h1 className="page-hero-h1" style={{ fontFamily: 'var(--serif)', fontSize: 64, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.03em', margin: '0 0 16px', maxWidth: 600 }}>
               Guides &amp; tips for<br/>
               <span style={{ fontStyle: 'italic', color: 'var(--terra-700)' }}>smarter travel.</span>
             </h1>
@@ -47,16 +47,16 @@ export default function BlogPage() {
         {/* ── Featured post ── */}
         <Section padded>
           <Link href={`/blog/${featured.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div className="lift" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'white' }}>
+            <div className="lift featured-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'white' }}>
               <div className={`ph-img ${featured.hero}`} style={{ minHeight: 360 }}/>
               <div style={{ padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
                   <span style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{featured.category}</span>
-                  <span style={{ background: 'var(--sand-100)', color: 'var(--ink-500)', fontSize: 11, padding: '4px 10px', borderRadius: 99 }}>Featured</span>
+                  <span style={{ background: 'var(--sand-100)', color: 'var(--ink-600)', fontSize: 11, padding: '4px 10px', borderRadius: 99 }}>Featured</span>
                 </div>
                 <h2 style={{ fontFamily: 'var(--serif)', fontSize: 30, fontWeight: 500, margin: '0 0 12px', letterSpacing: '-0.01em', lineHeight: 1.2 }}>{featured.title}</h2>
                 <p style={{ fontSize: 15, color: 'var(--ink-600)', lineHeight: 1.6, margin: '0 0 20px' }}>{featured.excerpt}</p>
-                <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--ink-500)' }}>
+                <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--ink-600)' }}>
                   <span>{formatDate(featured.publishedAt)}</span>
                   <span>·</span>
                   <span>{featured.readTime}</span>
@@ -81,7 +81,7 @@ export default function BlogPage() {
                       </div>
                       <h3 style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 500, margin: '0 0 10px', letterSpacing: '-0.01em', lineHeight: 1.25 }}>{post.title}</h3>
                       <p style={{ fontSize: 13, color: 'var(--ink-600)', lineHeight: 1.55, margin: '0 0 16px' }}>{post.excerpt}</p>
-                      <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--ink-500)', paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+                      <div style={{ display: 'flex', gap: 12, fontSize: 11, color: 'var(--ink-600)', paddingTop: 12, borderTop: '1px solid var(--line)' }}>
                         <span>{formatDate(post.publishedAt)}</span>
                         <span>·</span>
                         <span>{post.readTime}</span>

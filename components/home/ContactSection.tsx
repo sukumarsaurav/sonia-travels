@@ -47,7 +47,7 @@ export function ContactSection() {
           </div>
           <form onSubmit={handleSubmit} style={{ background: 'white', padding: 32, borderRadius: 14, border: '1px solid var(--line)' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: 28, margin: '0 0 8px', fontWeight: 500 }}>Send us a quick brief</h3>
-            <p style={{ margin: '0 0 24px', color: 'var(--ink-500)', fontSize: 14 }}>We reply within a working day, usually faster.</p>
+            <p style={{ margin: '0 0 24px', color: 'var(--ink-600)', fontSize: 14 }}>We reply within a working day, usually faster.</p>
             {status === 'sent' ? (
               <div style={{ background: 'var(--forest-100)', color: 'var(--forest-700)', padding: 20, borderRadius: 10, fontSize: 14 }}>
                 ✓ Inquiry sent! We'll get back to you shortly on WhatsApp or phone.

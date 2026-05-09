@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
 import { CAB_ROUTES, VEHICLE_TYPES } from './data'
+import { FAQAccordion } from '@/components/ui/FAQAccordion'
 
 export const metadata: Metadata = {
   title: 'Cab & Taxi Services in Pathankot | Outstation Cabs from ₹12/km | Sonia Travels',
@@ -35,7 +36,7 @@ export default function CabsPage() {
             <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.18em', color: 'var(--gold-500)', textTransform: 'uppercase', marginBottom: 16 }}>
               Cab &amp; Taxi Services · Pathankot
             </div>
-            <h1 style={{ fontFamily: 'var(--serif)', fontSize: 64, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.03em', margin: '0 0 20px', maxWidth: 700 }}>
+            <h1 className="page-hero-h1" style={{ fontFamily: 'var(--serif)', fontSize: 64, fontWeight: 500, lineHeight: 1, letterSpacing: '-0.03em', margin: '0 0 20px', maxWidth: 700 }}>
               Best cab service<br/>
               <span style={{ fontStyle: 'italic', color: 'var(--gold-400)' }}>in Pathankot.</span>
             </h1>
@@ -53,7 +54,7 @@ export default function CabsPage() {
                 <Ic.whatsapp s={16}/> WhatsApp Us
               </a>
             </div>
-            <div style={{ display: 'flex', gap: 32, marginTop: 40, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+            <div className="cabs-stats" style={{ display: 'flex', gap: 32, marginTop: 40, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               {[['10,000+', 'trips completed'], ['4.8', 'average rating'], ['24×7', 'helpline'], ['Zero', 'hidden charges']].map(([n, l]) => (
                 <div key={l}>
                   <div style={{ fontFamily: 'var(--serif)', fontSize: 28, fontWeight: 600, color: 'var(--gold-400)' }}>{n}</div>
@@ -75,7 +76,7 @@ export default function CabsPage() {
                     {v.id === 'tt' ? <Ic.truck s={22}/> : <Ic.car s={22}/>}
                   </div>
                   <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 4 }}>{v.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 8 }}>{v.examples} · {v.seats} seats</div>
+                  <div style={{ fontSize: 12, color: 'var(--ink-600)', marginBottom: 8 }}>{v.examples} · {v.seats} seats</div>
                   <div style={{ fontSize: 13, color: 'var(--ink-700)', lineHeight: 1.5, marginBottom: 12 }}>{v.desc}</div>
                   <div style={{ fontFamily: 'var(--mono)', fontSize: 13, fontWeight: 700, color: 'var(--forest-700)' }}>{v.rate}</div>
                 </div>
@@ -92,7 +93,7 @@ export default function CabsPage() {
                 <div className="lift reveal" style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 14, padding: 24, transitionDelay: `${i * 0.06}s`, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                     <div>
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-500)', textTransform: 'uppercase', marginBottom: 4 }}>{route.distance} · {route.duration}</div>
+                      <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.14em', color: 'var(--ink-600)', textTransform: 'uppercase', marginBottom: 4 }}>{route.distance} · {route.duration}</div>
                       <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, letterSpacing: '-0.01em' }}>{route.from} → {route.to}</div>
                     </div>
                     <span style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', fontSize: 10, fontWeight: 700, padding: '4px 8px', borderRadius: 6, letterSpacing: '0.06em', textTransform: 'uppercase', flexShrink: 0, marginTop: 4 }}>Popular</span>
@@ -100,7 +101,7 @@ export default function CabsPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16, background: 'var(--sand-50)', borderRadius: 10, padding: 12 }}>
                     {VEHICLE_TYPES.map(v => (
                       <div key={v.id} style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: 10, color: 'var(--ink-500)', marginBottom: 2 }}>{v.name}</div>
+                        <div style={{ fontSize: 10, color: 'var(--ink-600)', marginBottom: 2 }}>{v.name}</div>
                         <div style={{ fontFamily: 'var(--mono)', fontWeight: 700, fontSize: 13, color: 'var(--ink-900)' }}>{formatINR(route[v.priceKey])}</div>
                       </div>
                     ))}
@@ -150,7 +151,7 @@ export default function CabsPage() {
                 </tbody>
               </table>
             </div>
-            <p style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 12 }}>
+            <p style={{ fontSize: 12, color: 'var(--ink-600)', marginTop: 12 }}>
               Prices are one-way. Toll, state permits &amp; driver night charges (if applicable) included. Round-trip gets 10% off return leg.
             </p>
           </Section>
@@ -207,20 +208,13 @@ export default function CabsPage() {
 
         {/* ── FAQ ── */}
         <Section eyebrow="FAQ" title="Common questions.">
-          <div style={{ maxWidth: 760, display: 'grid', gap: 0 }}>
-            {[
-              { q: 'Are the fares one-way or round-trip?', a: 'All fares listed are one-way. For round trips we offer a 10% discount on the return leg. Inform us at the time of booking for the best rate.' },
-              { q: 'Is there a waiting charge if my train/flight is delayed?', a: 'We track your PNR / flight number and adjust pickup time automatically at no extra charge up to 60 minutes. Beyond that, ₹150/hour waiting applies.' },
-              { q: 'What vehicles are available for large groups?', a: 'We have 9-seater, 12-seater and 17-seater Tempo Travellers for groups. For very large groups (20+) we can arrange multiple vehicles.' },
-              { q: 'Do you operate to/from Pathankot Railway Station and Bus Stand?', a: 'Yes, we cover Pathankot Cantt Railway Station, Pathankot City Railway Station, and ISBT Pathankot for all pickups and drops.' },
-              { q: 'Can I book a cab for multiple days (outstation multi-day)?', a: 'Absolutely. We offer multi-day cab rentals for Himachal and J&K circuits. Pricing is based on km + driver night allowance. Contact us for a quote.' },
-            ].map((f, i) => (
-              <div key={i} style={{ padding: '20px 0', borderBottom: '1px solid var(--line)' }}>
-                <div style={{ fontFamily: 'var(--serif)', fontSize: 18, fontWeight: 500, marginBottom: 8 }}>{f.q}</div>
-                <div style={{ fontSize: 14, color: 'var(--ink-700)', lineHeight: 1.6 }}>{f.a}</div>
-              </div>
-            ))}
-          </div>
+          <FAQAccordion items={[
+            { q: 'Are the fares one-way or round-trip?', a: 'All fares listed are one-way. For round trips we offer a 10% discount on the return leg. Inform us at the time of booking for the best rate.' },
+            { q: 'Is there a waiting charge if my train/flight is delayed?', a: 'We track your PNR / flight number and adjust pickup time automatically at no extra charge up to 60 minutes. Beyond that, ₹150/hour waiting applies.' },
+            { q: 'What vehicles are available for large groups?', a: 'We have 9-seater, 12-seater and 17-seater Tempo Travellers for groups. For very large groups (20+) we can arrange multiple vehicles.' },
+            { q: 'Do you operate to/from Pathankot Railway Station and Bus Stand?', a: 'Yes, we cover Pathankot Cantt Railway Station, Pathankot City Railway Station, and ISBT Pathankot for all pickups and drops.' },
+            { q: 'Can I book a cab for multiple days (outstation multi-day)?', a: 'Absolutely. We offer multi-day cab rentals for Himachal and J&K circuits. Pricing is based on km + driver night allowance. Contact us for a quote.' },
+          ]}/>
         </Section>
 
       </main>

@@ -23,6 +23,7 @@ export function HomeClient() {
           borderRadius: 99, display: 'grid', placeItems: 'center',
           boxShadow: '0 8px 24px rgba(37,211,102,0.4)',
         }}
+        aria-label="Chat on WhatsApp"
         title="Chat on WhatsApp"
       >
         <Ic.whatsapp s={28}/>

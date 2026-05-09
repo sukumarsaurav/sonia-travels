@@ -26,9 +26,9 @@ export function Modal({ open, onClose, title, sub, width = 640, children, action
         <div style={{ padding: '24px 28px 18px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
           <div>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>{title}</h3>
-            {sub && <div style={{ fontSize: 13, color: 'var(--ink-500)', marginTop: 4 }}>{sub}</div>}
+            {sub && <div style={{ fontSize: 13, color: 'var(--ink-600)', marginTop: 4 }}>{sub}</div>}
           </div>
-          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 8, color: 'var(--ink-500)', display: 'grid', placeItems: 'center' }}>
+          <button onClick={onClose} aria-label="Close" style={{ width: 32, height: 32, borderRadius: 8, color: 'var(--ink-600)', display: 'grid', placeItems: 'center' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6L18 18M6 18L18 6"/></svg>
           </button>
         </div>

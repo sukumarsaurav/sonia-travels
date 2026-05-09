@@ -67,7 +67,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
   return (
     <RevealProvider>
       <Navbar/>
-      <main>
+      <main className="has-mobile-bar">
         {/* Hero */}
         <div style={{ position: 'relative', height: 480, overflow: 'hidden' }}>
           {pkg.hero_url ? (
@@ -85,7 +85,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                 <Pill color="sand" size="sm">{pkg.tag}</Pill>
                 <Pill color="sand" size="sm">{pkg.region}</Pill>
               </div>
-              <h1 style={{ fontFamily: 'var(--serif)', fontSize: 80, fontWeight: 500, margin: 0, letterSpacing: '-0.03em', lineHeight: 1 }}>{pkg.name}</h1>
+              <h1 className="pkg-hero-h1" style={{ fontFamily: 'var(--serif)', fontSize: 80, fontWeight: 500, margin: 0, letterSpacing: '-0.03em', lineHeight: 1 }}>{pkg.name}</h1>
               <div style={{ display: 'flex', gap: 24, marginTop: 16, fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.92 }}>
                 <span>{pkg.nights}N · {pkg.days}D</span><span>·</span>
                 <span>From {formatINR(pkg.price)}/pax</span><span>·</span>
@@ -144,7 +144,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                 <div>
                   <h3 style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, margin: '0 0 12px' }}>Not included</h3>
                   {exclusions.map((x, i) => (
-                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '6px 0', fontSize: 14, color: 'var(--ink-500)' }}>
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '6px 0', fontSize: 14, color: 'var(--ink-600)' }}>
                       <span style={{ marginTop: 2 }}><Ic.x s={14}/></span>{x}
                     </div>
                   ))}
@@ -155,18 +155,18 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
             {/* Booking sidebar */}
             <aside style={{ position: 'sticky', top: 96, background: 'white', border: '1px solid var(--line)', borderRadius: 14, padding: 24, boxShadow: 'var(--shadow-sm)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-                <span style={{ fontSize: 12, color: 'var(--ink-500)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>From</span>
+                <span style={{ fontSize: 12, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>From</span>
                 <span style={{ fontSize: 12, color: 'var(--forest-600)', fontWeight: 600 }}>Razorpay secured</span>
               </div>
               <div style={{ fontFamily: 'var(--serif)', fontSize: 40, fontWeight: 600, color: 'var(--terra-700)', lineHeight: 1, margin: '4px 0' }}>{formatINR(pkg.price)}</div>
-              <div style={{ fontSize: 13, color: 'var(--ink-500)', marginBottom: 20 }}>per person · twin sharing</div>
+              <div style={{ fontSize: 13, color: 'var(--ink-600)', marginBottom: 20 }}>per person · twin sharing</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
                 <div style={{ padding: 12, background: 'var(--sand-100)', borderRadius: 8 }}>
-                  <div style={{ fontSize: 10, color: 'var(--ink-500)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Duration</div>
+                  <div style={{ fontSize: 10, color: 'var(--ink-600)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Duration</div>
                   <div style={{ fontWeight: 600, marginTop: 2 }}>{pkg.nights}N · {pkg.days}D</div>
                 </div>
                 <div style={{ padding: 12, background: 'var(--sand-100)', borderRadius: 8 }}>
-                  <div style={{ fontSize: 10, color: 'var(--ink-500)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Group</div>
+                  <div style={{ fontSize: 10, color: 'var(--ink-600)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Group</div>
                   <div style={{ fontWeight: 600, marginTop: 2 }}>2 – 15</div>
                 </div>
               </div>
@@ -189,6 +189,29 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
           </div>
         </Section>
       </main>
+
+      {/* ── Sticky mobile booking bar ── */}
+      <div className="mobile-book-bar" style={{
+        display: 'none', position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+        background: 'white', borderTop: '1px solid var(--line)',
+        padding: '12px 20px', gap: 10, alignItems: 'center',
+        boxShadow: '0 -4px 20px rgba(26,24,20,0.10)',
+      }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 11, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>From</div>
+          <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 600, color: 'var(--terra-700)', lineHeight: 1.1 }}>{formatINR(pkg.price)}<span style={{ fontSize: 12, fontWeight: 400, color: 'var(--ink-600)' }}>/pax</span></div>
+        </div>
+        <a href="tel:+918460222809"
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'var(--ink-900)', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+          <Ic.phone s={15}/> Call Us
+        </a>
+        <a href={`https://wa.me/918460222809?text=Hi%2C+I%27m+interested+in+the+${encodeURIComponent(pkg.name)}+package`}
+          target="_blank" rel="noopener noreferrer"
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#25D366', color: 'white', padding: '12px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+          <Ic.whatsapp s={15}/> WhatsApp
+        </a>
+      </div>
+
       <Footer/>
     </RevealProvider>
   )

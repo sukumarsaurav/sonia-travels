@@ -27,7 +27,7 @@ export function Footer() {
           <div style={{ fontSize: 13, lineHeight: 1.7 }}>Defence Road, Mamoon<br/>Pathankot, Punjab 145001<br/>+91 84602 22809<br/>Open 24×7</div>
         </div>
       </div>
-      <div className="footer-bottom" style={{ maxWidth: 1240, margin: '48px auto 0', paddingTop: 24, borderTop: '1px solid #3a342b', display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: 'var(--mono)', letterSpacing: '0.1em', color: 'var(--ink-500)' }}>
+      <div className="footer-bottom" style={{ maxWidth: 1240, margin: '48px auto 0', paddingTop: 24, borderTop: '1px solid #3a342b', display: 'flex', justifyContent: 'space-between', fontSize: 12, fontFamily: 'var(--mono)', letterSpacing: '0.1em', color: 'var(--sand-300)' }}>
         <span>© 2026 SONIA TOUR & TRAVELS</span>
         <span>JD VERIFIED · 4.6 ★</span>
       </div>

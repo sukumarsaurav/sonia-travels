@@ -3,7 +3,7 @@ interface LogoProps { dark?: boolean; size?: 'sm' | 'md' | 'lg' }
 
 export function Logo({ dark, size = 'md' }: LogoProps) {
   const h = size === 'lg' ? 52 : size === 'sm' ? 30 : 40
-  const sub = dark ? 'var(--sand-300)' : 'var(--ink-500)'
+  const sub = dark ? 'var(--sand-300)' : 'var(--ink-600)'
   const fg  = dark ? 'var(--sand-50)'  : 'var(--ink-900)'
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

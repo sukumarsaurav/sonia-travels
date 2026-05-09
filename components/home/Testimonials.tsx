@@ -30,7 +30,7 @@ export function Testimonials() {
               </div>
               <blockquote style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: 'var(--ink-700)', marginBottom: 24 }}>{t.text}</blockquote>
               <figcaption style={{ paddingTop: 16, borderTop: '1px solid var(--line)', fontSize: 14, fontWeight: 500, color: 'var(--ink-900)' }}>
-                {t.name}<span style={{ fontSize: 12, color: 'var(--ink-500)', fontWeight: 400, marginLeft: 8 }}>· {t.trip}</span>
+                {t.name}<span style={{ fontSize: 12, color: 'var(--ink-600)', fontWeight: 400, marginLeft: 8 }}>· {t.trip}</span>
               </figcaption>
             </figure>
           ))}

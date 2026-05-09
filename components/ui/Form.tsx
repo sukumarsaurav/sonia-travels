@@ -12,7 +12,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
     <label style={{ display: 'block' }}>
       <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-700)', marginBottom: 6, letterSpacing: '0.02em' }}>{label}</div>
       {children}
-      {hint && <div style={{ fontSize: 11, color: 'var(--ink-500)', marginTop: 4 }}>{hint}</div>}
+      {hint && <div style={{ fontSize: 11, color: 'var(--ink-600)', marginTop: 4 }}>{hint}</div>}
     </label>
   )
 }

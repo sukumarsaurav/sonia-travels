@@ -33,15 +33,15 @@ export function PackageCard({ pkg, featured }: { pkg: Package; featured?: boolea
       <div style={{ padding: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
           <h3 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>{pkg.name}</h3>
-          <div style={{ fontSize: 11, color: 'var(--ink-500)', fontFamily: 'var(--mono)', letterSpacing: '0.08em' }}>{pkg.nights}N · {pkg.days}D</div>
+          <div style={{ fontSize: 11, color: 'var(--ink-600)', fontFamily: 'var(--mono)', letterSpacing: '0.08em' }}>{pkg.nights}N · {pkg.days}D</div>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--ink-500)', marginBottom: 12 }}>{pkg.region}</div>
+        <div style={{ fontSize: 12, color: 'var(--ink-600)', marginBottom: 12 }}>{pkg.region}</div>
         <p style={{ fontSize: 13, color: 'var(--ink-700)', margin: '0 0 16px', lineHeight: 1.5 }}>{pkg.desc || pkg.description}</p>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, borderTop: '1px dashed var(--line)' }}>
           <div>
-            <div style={{ fontSize: 10, color: 'var(--ink-500)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>From</div>
+            <div style={{ fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>From</div>
             <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 600, color: 'var(--terra-700)' }}>
-              {formatINR(pkg.price)}<span style={{ fontSize: 12, color: 'var(--ink-500)', fontWeight: 400, fontFamily: 'var(--sans)' }}> / pax</span>
+              {formatINR(pkg.price)}<span style={{ fontSize: 12, color: 'var(--ink-600)', fontWeight: 400, fontFamily: 'var(--sans)' }}> / pax</span>
             </div>
           </div>
           <div style={{ color: 'var(--ink-700)', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600 }}>View <Ic.arrow s={14}/></div>
