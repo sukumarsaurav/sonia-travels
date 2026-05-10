@@ -196,9 +196,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
               </div>
               <BookingButton pkgId={pkg.id}/>
               <div style={{ marginTop: 8 }}>
-                <Btn variant="whatsapp" full icon={<Ic.whatsapp s={16}/>}
-                  onClick={() => {}} // handled client-side via BookingButton sibling
-                >
+                <Btn variant="whatsapp" full icon={<Ic.whatsapp s={16}/>}>
                   <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
                     Chat on WhatsApp
                   </a>
