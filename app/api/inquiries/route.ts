@@ -30,18 +30,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
   }
 
-  const { data, error } = await adminClient()
+  // No .select() — anonymous inserts can't read the row back under RLS, and the
+  // client only needs success/failure here.
+  const { error } = await adminClient()
     .from('inquiries')
     .insert([{ name, phone, email, interest, message, channel: 'web', unread: true }])
-    .select()
-    .single()
 
   if (error) {
     console.error('[inquiries POST]', error.message)
     return NextResponse.json({ error: 'Failed to save inquiry' }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, id: data.id })
+  return NextResponse.json({ success: true })
 }
 
 // GET — admin only

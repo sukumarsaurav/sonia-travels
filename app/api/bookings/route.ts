@@ -46,11 +46,15 @@ export async function POST(req: NextRequest) {
   }
 
   const booking_ref = generateRef()
+  const id = crypto.randomUUID()
   const supabase = adminClient()
 
-  const { data, error } = await supabase
+  // Generate the id here and skip .select() — a RETURNING clause would require
+  // SELECT visibility on the new row, which an anonymous insert lacks under RLS.
+  const { error } = await supabase
     .from('bookings')
     .insert([{
+      id,
       booking_ref,
       customer_name, customer_phone, customer_email,
       package_id, package_name, travelers, depart_date,
@@ -59,15 +63,13 @@ export async function POST(req: NextRequest) {
       status: 'pending',
       payment_status: 'unpaid',
     }])
-    .select()
-    .single()
 
   if (error) {
     console.error('[bookings POST]', error.message)
     return NextResponse.json({ error: 'Failed to save booking' }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, id: data.id, booking_ref: data.booking_ref })
+  return NextResponse.json({ success: true, id, booking_ref })
 }
 
 // GET — admin only: verify session role before returning data

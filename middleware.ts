@@ -1,51 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit } from '@/lib/ratelimit'
 
-// ⚠️ PRODUCTION LIMITATION (R-01): This in-memory Map is NOT shared across
-// Vercel serverless/edge instances and is wiped on cold starts, so on Vercel
-// the limit resets unpredictably and offers only weak protection. It works as
-// a best-effort throttle. To make rate limiting reliable, provision Vercel KV
-// or Upstash Redis and swap rateLimit() for @upstash/ratelimit (shared state).
-// Tracking issue: replace before relying on this for abuse prevention.
-const WINDOW_MS = 60_000
-const MAX_POST_PER_WINDOW = 15
-
-const ipCounters = new Map<string, { count: number; resetAt: number }>()
-
-function rateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = ipCounters.get(ip)
-  if (!entry || now > entry.resetAt) {
-    ipCounters.set(ip, { count: 1, resetAt: now + WINDOW_MS })
-    return true
-  }
-  entry.count++
-  return entry.count <= MAX_POST_PER_WINDOW
-}
-
-export function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-
-  // Rate-limit POST to API write endpoints
+// Rate-limits POST to API write endpoints. Uses Upstash Redis when configured
+// (UPSTASH_REDIS_REST_URL + _TOKEN) for reliable cross-instance limiting on
+// Vercel; otherwise falls back to a best-effort in-memory counter. See
+// lib/ratelimit.ts.
+export async function middleware(req: NextRequest) {
   if (req.method === 'POST' && req.nextUrl.pathname.startsWith('/api/')) {
     const ip =
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       req.headers.get('x-real-ip') ??
       'unknown'
 
-    if (!rateLimit(ip)) {
+    const allowed = await checkRateLimit(ip)
+    if (!allowed) {
       return NextResponse.json(
         { error: 'Too many requests — please wait a moment.' },
-        {
-          status: 429,
-          headers: { 'Retry-After': '60', 'Content-Type': 'application/json' },
-        }
+        { status: 429, headers: { 'Retry-After': '60', 'Content-Type': 'application/json' } }
       )
     }
   }
 
-  return res
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/api/:path*'],
 }

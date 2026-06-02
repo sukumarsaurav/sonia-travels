@@ -5,6 +5,7 @@ import { Btn } from '@/components/ui/Button'
 import { Field, Input, Textarea } from '@/components/ui/Form'
 import { Ic } from '@/components/ui/Icons'
 import { PACKAGES, formatINR } from '@/lib/data'
+import { computePricing } from '@/lib/pricing'
 import type { Package } from '@/types'
 
 interface Props {
@@ -14,8 +15,35 @@ interface Props {
   onComplete?: () => void
 }
 
+interface RazorpayResponse {
+  razorpay_order_id: string
+  razorpay_payment_id: string
+  razorpay_signature: string
+}
+declare global {
+  interface Window {
+    Razorpay?: new (opts: Record<string, unknown>) => { open: () => void }
+  }
+}
+
 const TODAY = new Date().toISOString().slice(0, 10)
 const DEFAULT_DEPART = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)
+
+// Load Razorpay checkout.js once, on demand.
+let razorpayScriptPromise: Promise<boolean> | null = null
+function loadRazorpay(): Promise<boolean> {
+  if (typeof window === 'undefined') return Promise.resolve(false)
+  if (window.Razorpay) return Promise.resolve(true)
+  if (razorpayScriptPromise) return razorpayScriptPromise
+  razorpayScriptPromise = new Promise(resolve => {
+    const s = document.createElement('script')
+    s.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    s.onload = () => resolve(true)
+    s.onerror = () => resolve(false)
+    document.body.appendChild(s)
+  })
+  return razorpayScriptPromise
+}
 
 function StepDots({ step, total }: { step: number; total: number }) {
   return (
@@ -59,12 +87,14 @@ function BookingConfirm({
   const [method, setMethod] = useState('upi')
   const [processing, setProcessing] = useState(false)
   const [bookingRef, setBookingRef] = useState('')
+  const [paid, setPaid] = useState(false)
   const [error, setError] = useState('')
 
   const handleSubmit = async () => {
     setProcessing(true)
     setError('')
     try {
+      // 1. Create the booking record.
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,9 +109,7 @@ function BookingConfirm({
           amount: total,
           room_type: data.room,
           notes: data.notes || null,
-          add_ons: Object.entries(data.addons)
-            .filter(([, v]) => v)
-            .map(([k]) => k),
+          add_ons: Object.entries(data.addons).filter(([, v]) => v).map(([k]) => k),
         }),
       })
       const json = await res.json()
@@ -90,7 +118,64 @@ function BookingConfirm({
         setProcessing(false)
         return
       }
-      setBookingRef(json.booking_ref)
+      const bookingId: string = json.id
+      const ref: string = json.booking_ref
+
+      // 2. Ask the server to create a Razorpay order (amount recomputed server-side).
+      const orderRes = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking_id: bookingId }),
+      })
+      const order = await orderRes.json().catch(() => ({}))
+
+      // Razorpay not configured (or order failed) → manual-callback fallback.
+      if (!orderRes.ok || !order.configured) {
+        setBookingRef(ref)
+        setProcessing(false)
+        return
+      }
+
+      // 3. Open Razorpay checkout.
+      const ready = await loadRazorpay()
+      if (!ready || !window.Razorpay) {
+        setBookingRef(ref)
+        setProcessing(false)
+        return
+      }
+
+      const rzp = new window.Razorpay({
+        key: order.key_id,
+        amount: order.amount,
+        currency: order.currency,
+        order_id: order.order_id,
+        name: 'Sonia Tour & Travels',
+        description: `${pkg.name} package`,
+        prefill: { name: data.name, email: data.email, contact: data.phone },
+        theme: { color: '#b04a2f' },
+        handler: async (resp: RazorpayResponse) => {
+          // 4. Verify the signature server-side before confirming.
+          const vr = await fetch('/api/payments/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: resp.razorpay_order_id,
+              razorpay_payment_id: resp.razorpay_payment_id,
+              razorpay_signature: resp.razorpay_signature,
+              booking_id: bookingId,
+            }),
+          })
+          if (vr.ok) {
+            setPaid(true)
+            setBookingRef(ref)
+          } else {
+            setError('Payment could not be verified. If money was deducted, contact us with your reference number.')
+            setProcessing(false)
+          }
+        },
+        modal: { ondismiss: () => setProcessing(false) },
+      })
+      rzp.open()
     } catch {
       setError('Network error — please check your connection.')
       setProcessing(false)
@@ -102,12 +187,16 @@ function BookingConfirm({
       <div style={{ width: 72, height: 72, borderRadius: 99, background: 'var(--forest-100)', color: 'var(--forest-700)', display: 'grid', placeItems: 'center', margin: '0 auto 20px' }}>
         <Ic.check s={36}/>
       </div>
-      <h3 style={{ fontFamily: 'var(--serif)', fontSize: 32, margin: '0 0 8px', fontWeight: 500 }}>Request received!</h3>
+      <h3 style={{ fontFamily: 'var(--serif)', fontSize: 32, margin: '0 0 8px', fontWeight: 500 }}>
+        {paid ? 'Booking confirmed' : 'Request received!'}
+      </h3>
       <div style={{ fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--terra-700)', letterSpacing: '0.1em', marginBottom: 12 }}>
         Ref: {bookingRef}
       </div>
       <div style={{ color: 'var(--ink-600)', fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>
-        We&apos;ll call you within 2 hours to confirm availability and collect payment via Razorpay. Check WhatsApp for updates.
+        {paid
+          ? 'Payment received. We’ll send your itinerary on WhatsApp & email shortly.'
+          : 'We’ll call you within 2 hours to confirm availability and collect payment via Razorpay. Check WhatsApp for updates.'}
       </div>
       <Btn variant="dark" onClick={onComplete}>Done</Btn>
     </div>
@@ -202,13 +291,11 @@ export function BookingFlow({ pkgId, pkg: propPkg, onClose, onComplete }: Props)
   const toggleAddon = (k: keyof FormData['addons']) =>
     setData(d => ({ ...d, addons: { ...d.addons, [k]: !d.addons[k] } }))
 
-  const addonPrices = { insurance: 600, photo: 2400, airport: 1200 }
-  const baseTotal = pkg.price * data.travelers
-  const addonsTotal = Object.entries(data.addons)
-    .filter(([, v]) => v)
-    .reduce((s, [k]) => s + addonPrices[k as keyof typeof addonPrices] * data.travelers, 0)
-  const gst = Math.round((baseTotal + addonsTotal) * 0.05)
-  const total = baseTotal + addonsTotal + gst
+  const { base: baseTotal, gst, total } = computePricing({
+    packagePrice: pkg.price,
+    travelers: data.travelers,
+    addons: data.addons,
+  })
   const stepNames = ['Trip details', 'Your info', 'Add-ons & review', 'Payment']
 
   function validate(): boolean {
