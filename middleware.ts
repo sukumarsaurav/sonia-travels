@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// In-memory rate limiter — adequate for single-instance dev/small-traffic.
-// For multi-region production replace with Upstash Redis + @upstash/ratelimit.
+// ⚠️ PRODUCTION LIMITATION (R-01): This in-memory Map is NOT shared across
+// Vercel serverless/edge instances and is wiped on cold starts, so on Vercel
+// the limit resets unpredictably and offers only weak protection. It works as
+// a best-effort throttle. To make rate limiting reliable, provision Vercel KV
+// or Upstash Redis and swap rateLimit() for @upstash/ratelimit (shared state).
+// Tracking issue: replace before relying on this for abuse prevention.
 const WINDOW_MS = 60_000
 const MAX_POST_PER_WINDOW = 15
 

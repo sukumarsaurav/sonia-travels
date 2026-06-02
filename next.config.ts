@@ -1,6 +1,23 @@
 import type { NextConfig } from "next";
 
+// Pragmatic CSP: the app uses pervasive inline styles (style-src needs
+// 'unsafe-inline') and Next.js injects inline bootstrap scripts. Allowlists
+// cover Supabase (data + storage), Unsplash images, and the Google Maps embed.
+const csp = [
+  "default-src 'self'",
+  "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://www.google.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  "connect-src 'self' https://*.supabase.co",
+  "frame-src https://www.google.com",
+  "frame-ancestors 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ')
+
 const securityHeaders = [
+  { key: 'Content-Security-Policy', value: csp },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

@@ -13,10 +13,12 @@ export default async function AccountPage() {
     .eq('id', user.id)
     .single()
 
+  // RLS (bookings_select) already scopes rows to this user — matches on
+  // user_id = auth.uid() OR customer_email = auth.email(). No need to
+  // interpolate user-controlled values into a PostgREST filter string.
   const { data: bookings } = await supabase
     .from('bookings')
     .select('*')
-    .or(`user_id.eq.${user.id},customer_email.eq.${user.email}`)
     .order('created_at', { ascending: false })
 
   return (
