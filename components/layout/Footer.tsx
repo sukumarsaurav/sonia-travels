@@ -19,7 +19,7 @@ export function Footer() {
         <div>
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--sand-100)', textTransform: 'uppercase', marginBottom: 16 }}>Services</div>
           {['Air Ticketing', 'Tourist Taxi', 'Railway Booking', 'Bus Booking', 'Visa Assist'].map(s => (
-            <div key={s} style={{ fontSize: 13, padding: '4px 0' }}>{s}</div>
+            <Link key={s} href="/services" style={{ display: 'block', color: 'var(--sand-300)', fontSize: 13, padding: '4px 0' }}>{s}</Link>
           ))}
         </div>
         <div>

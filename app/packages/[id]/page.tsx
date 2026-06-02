@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { BookingButton } from '@/components/booking/BookingButton'
+import { PackageHeroImage } from '@/components/packages/PackageHeroImage'
 import { Btn, Pill } from '@/components/ui/Button'
 import { Ic } from '@/components/ui/Icons'
 import { Section } from '@/components/ui/Section'
@@ -95,7 +96,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
         {/* Hero */}
         <div style={{ position: 'relative', height: 480, overflow: 'hidden' }}>
           {pkg.hero_url ? (
-            <Image src={pkg.hero_url} alt={pkg.name} fill priority style={{ objectFit: 'cover' }}/>
+            <PackageHeroImage src={pkg.hero_url} alt={pkg.name} hero={pkg.hero}/>
           ) : (
             <div className={`ph-img ${pkg.hero}`} style={{ height: '100%' }}/>
           )}
@@ -194,7 +195,7 @@ export default async function PackageDetailPage({ params }: { params: Promise<{ 
                   <div style={{ fontWeight: 600, marginTop: 2 }}>2 – 15</div>
                 </div>
               </div>
-              <BookingButton pkgId={pkg.id}/>
+              <BookingButton pkgId={pkg.id} pkg={pkg}/>
               <div style={{ marginTop: 8 }}>
                 <Btn variant="whatsapp" full icon={<Ic.whatsapp s={16}/>}>
                   <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', width: '100%', display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>

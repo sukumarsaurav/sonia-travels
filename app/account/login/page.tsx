@@ -7,7 +7,7 @@ import { Logo } from '@/components/ui/Logo'
 import { Btn } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Form'
 
-type Mode = 'login' | 'signup'
+type Mode = 'login' | 'signup' | 'reset'
 
 function AuthForm() {
   const supabase = createBrowserSupabase()
@@ -23,13 +23,25 @@ function AuthForm() {
   const [error, setError] = useState(searchParams.get('error') ? 'Authentication failed. Please try again.' : '')
   const [success, setSuccess] = useState('')
 
+  const reset = (next: Mode) => { setMode(next); setError(''); setSuccess('') }
+
   const signInWithGoogle = async () => {
     setGoogleLoading(true); setError('')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/account` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     })
     if (error) { setError(error.message); setGoogleLoading(false) }
+  }
+
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault(); setLoading(true); setError(''); setSuccess('')
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    })
+    if (error) setError(error.message)
+    else setSuccess('Password reset email sent — check your inbox.')
+    setLoading(false)
   }
 
   const handleEmail = async (e: React.FormEvent) => {
@@ -37,7 +49,7 @@ function AuthForm() {
     if (mode === 'signup') {
       const { error } = await supabase.auth.signUp({
         email, password,
-        options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/auth/callback?next=/account` },
+        options: { data: { full_name: name }, emailRedirectTo: `${window.location.origin}/auth/callback` },
       })
       if (error) setError(error.message)
       else setSuccess('Check your email for a confirmation link.')
@@ -46,22 +58,47 @@ function AuthForm() {
       if (error) setError(error.message)
       else if (data.user) {
         const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
+          .from('user_profiles').select('role').eq('id', data.user.id).single()
         router.push(profile?.role === 'admin' ? '/admin' : '/account')
       }
     }
     setLoading(false)
   }
 
+  const Alert = ({ msg, type }: { msg: string; type: 'error' | 'success' }) => (
+    <div style={{ background: type === 'error' ? '#fadcd6' : '#dff0e1', border: `1px solid ${type === 'error' ? '#f5c4bc' : '#b3dbb8'}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, color: type === 'error' ? 'var(--terra-700)' : '#1f6e3a', marginBottom: 16 }}>
+      {msg}
+    </div>
+  )
+
+  // ── Password reset mode ─────────────────────────────────────────────────────
+  if (mode === 'reset') return (
+    <form onSubmit={handleReset}>
+      {error && <Alert msg={error} type="error"/>}
+      {success && <Alert msg={success} type="success"/>}
+      <p style={{ fontSize: 14, color: 'var(--ink-600)', margin: '0 0 20px', lineHeight: 1.5 }}>
+        Enter your email and we&apos;ll send a reset link.
+      </p>
+      <div style={{ display: 'grid', gap: 14 }}>
+        <Field label="Email address">
+          <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required/>
+        </Field>
+        <Btn type="submit" variant="dark" size="lg" full disabled={loading}>
+          {loading ? 'Sending…' : 'Send reset link'}
+        </Btn>
+      </div>
+      <div style={{ marginTop: 20, textAlign: 'center', fontSize: 14, color: 'var(--ink-500)' }}>
+        <button type="button" onClick={() => reset('login')} style={{ color: 'var(--terra-700)', fontWeight: 600 }}>← Back to sign in</button>
+      </div>
+    </form>
+  )
+
+  // ── Login / Signup mode ─────────────────────────────────────────────────────
   return (
     <form onSubmit={handleEmail}>
-      {error && <div style={{ background: '#fadcd6', border: '1px solid #f5c4bc', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: 'var(--terra-700)', marginBottom: 16 }}>{error}</div>}
-      {success && <div style={{ background: '#dff0e1', border: '1px solid #b3dbb8', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#1f6e3a', marginBottom: 16 }}>{success}</div>}
+      {error && <Alert msg={error} type="error"/>}
+      {success && <Alert msg={success} type="success"/>}
 
-      {/* Google */}
       <button type="button" onClick={signInWithGoogle} disabled={googleLoading}
         style={{ width: '100%', padding: '13px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, border: '1px solid var(--line)', borderRadius: 10, background: googleLoading ? 'var(--sand-100)' : 'white', fontSize: 14, fontWeight: 600, cursor: googleLoading ? 'not-allowed' : 'pointer', color: 'var(--ink-900)', marginBottom: 20 }}>
         <svg width="18" height="18" viewBox="0 0 24 24">
@@ -101,11 +138,19 @@ function AuthForm() {
         </Btn>
       </div>
 
-      <div style={{ marginTop: 20, textAlign: 'center', fontSize: 14, color: 'var(--ink-500)' }}>
+      {mode === 'login' && (
+        <div style={{ marginTop: 12, textAlign: 'right' }}>
+          <button type="button" onClick={() => reset('reset')} style={{ fontSize: 13, color: 'var(--ink-500)' }}>
+            Forgot password?
+          </button>
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, textAlign: 'center', fontSize: 14, color: 'var(--ink-500)' }}>
         {mode === 'login' ? (
-          <>Don&apos;t have an account? <button type="button" onClick={() => { setMode('signup'); setError(''); setSuccess('') }} style={{ color: 'var(--terra-700)', fontWeight: 600 }}>Sign up</button></>
+          <>Don&apos;t have an account? <button type="button" onClick={() => reset('signup')} style={{ color: 'var(--terra-700)', fontWeight: 600 }}>Sign up</button></>
         ) : (
-          <>Already have an account? <button type="button" onClick={() => { setMode('login'); setError(''); setSuccess('') }} style={{ color: 'var(--terra-700)', fontWeight: 600 }}>Sign in</button></>
+          <>Already have an account? <button type="button" onClick={() => reset('login')} style={{ color: 'var(--terra-700)', fontWeight: 600 }}>Sign in</button></>
         )}
       </div>
     </form>

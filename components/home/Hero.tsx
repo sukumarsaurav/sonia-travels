@@ -6,11 +6,15 @@ import { Ic } from '@/components/ui/Icons'
 
 export function Hero() {
   const [dest, setDest] = useState('')
+  const [travelers, setTravelers] = useState('2')
   const router = useRouter()
 
   const handleSearch = () => {
+    const params = new URLSearchParams()
     const q = dest.trim()
-    router.push(q ? `/packages?q=${encodeURIComponent(q)}` : '/packages')
+    if (q) params.set('q', q)
+    if (travelers !== '2') params.set('travelers', travelers)
+    router.push(`/packages${params.size ? `?${params.toString()}` : ''}`)
   }
 
   const handleKey = (e: React.KeyboardEvent) => {
@@ -33,24 +37,24 @@ export function Hero() {
             From the apple orchards of Manali to the backwaters of Kerala — eighteen years of itineraries built around how <em>you</em> like to travel.
           </p>
 
-          {/* Search bar — stacks to 1-col on mobile via hero-search CSS class */}
           <div className="hero-search" style={{ background: 'white', borderRadius: 14, padding: 12, display: 'grid', gridTemplateColumns: '1.4fr 1fr auto', gap: 8, boxShadow: 'var(--shadow-md)', border: '1px solid var(--line)' }}>
-            <label style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
-              <div style={{ fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Destination</div>
+            <div style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
+              <label htmlFor="hero-dest" style={{ display: 'block', fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Destination</label>
               <input
+                id="hero-dest"
                 value={dest}
                 onChange={e => setDest(e.target.value)}
                 onKeyDown={handleKey}
                 placeholder="Manali, Goa, Kerala…"
-                aria-label="Destination"
                 style={{ border: 'none', outline: 'none', fontSize: 15, fontWeight: 500, width: '100%', background: 'transparent' }}
               />
-            </label>
-            <label style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
-              <div style={{ fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Travellers</div>
+            </div>
+            <div style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
+              <label htmlFor="hero-travelers" style={{ display: 'block', fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Travellers</label>
               <select
-                defaultValue="2"
-                aria-label="Number of travellers"
+                id="hero-travelers"
+                value={travelers}
+                onChange={e => setTravelers(e.target.value)}
                 style={{ border: 'none', outline: 'none', fontSize: 15, fontWeight: 500, width: '100%', background: 'transparent', fontFamily: 'inherit' }}
               >
                 <option value="1">1 traveller</option>
@@ -59,7 +63,7 @@ export function Hero() {
                 <option value="4">4 travellers</option>
                 <option value="5">5+ travellers</option>
               </select>
-            </label>
+            </div>
             <Btn variant="dark" size="md" icon={<Ic.search s={14}/>} onClick={handleSearch}>Search</Btn>
           </div>
 
@@ -71,25 +75,18 @@ export function Hero() {
         </div>
 
         <div className="hero-collage" style={{ position: 'relative', height: 560 }}>
-          <div className="ph-img terra" style={{ position: 'absolute', top: 0, right: 0, width: 360, height: 460, borderRadius: 16, transform: 'rotate(2deg)' }}/>
-          <div className="ph-img forest" style={{ position: 'absolute', bottom: 0, left: 0, width: 280, height: 340, borderRadius: 16, transform: 'rotate(-3deg)', boxShadow: 'var(--shadow-lg)' }}/>
-          <div style={{ position: 'absolute', top: 220, left: 60, background: 'white', padding: '12px 16px', borderRadius: 12, boxShadow: 'var(--shadow-md)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 10, transform: 'rotate(-2deg)' }}>
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--forest-100)', display: 'grid', placeItems: 'center', color: 'var(--forest-700)' }}><Ic.check s={18}/></div>
-            <div>
-              <div style={{ fontSize: 12, color: 'var(--ink-600)' }}>Just confirmed</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>Manali · 4N5D · 4 guests</div>
-            </div>
-          </div>
+          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80" alt="Taj Mahal, India" style={{ position: 'absolute', top: 0, right: 0, width: 360, height: 460, borderRadius: 16, transform: 'rotate(2deg)', objectFit: 'cover', boxShadow: 'var(--shadow-md)' }}/>
+          <img src="https://images.unsplash.com/photo-1623194098675-9273f00e99d8?auto=format&fit=crop&w=600&q=80" alt="Kerala backwaters" style={{ position: 'absolute', bottom: 0, left: 0, width: 280, height: 340, borderRadius: 16, transform: 'rotate(-3deg)', objectFit: 'cover', boxShadow: 'var(--shadow-lg)' }}/>
         </div>
       </div>
 
       <div style={{ marginTop: 80, borderTop: '1px solid var(--sand-200)', padding: '20px 32px', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 32, fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--ink-600)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
         <span>18+ Years in business</span>
-        <span aria-hidden>·</span>
+        <span aria-hidden="true">·</span>
         <span>10,000+ happy travellers</span>
-        <span aria-hidden>·</span>
+        <span aria-hidden="true">·</span>
         <span>10 destinations</span>
-        <span aria-hidden>·</span>
+        <span aria-hidden="true">·</span>
         <span>JD Verified</span>
       </div>
     </div>

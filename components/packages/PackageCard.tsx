@@ -1,7 +1,8 @@
+'use client'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Pill } from '@/components/ui/Button'
 import { Ic } from '@/components/ui/Icons'
+import { SafeImage } from '@/components/ui/SafeImage'
 import type { Package } from '@/types'
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
@@ -15,13 +16,14 @@ export function PackageCard({ pkg, featured }: { pkg: Package; featured?: boolea
     }}>
       <div style={{ height: imgHeight, position: 'relative', overflow: 'hidden' }}>
         {pkg.hero_url ? (
-          <Image
+          <SafeImage
             src={pkg.hero_url}
             alt={pkg.name}
             fill
             sizes="(max-width: 768px) 100vw, 33vw"
             style={{ objectFit: 'cover' }}
             priority={featured}
+            fallbackClass={pkg.hero}
           />
         ) : (
           <div className={`ph-img ${pkg.hero}`} style={{ height: '100%' }}/>
