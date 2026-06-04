@@ -10,7 +10,7 @@ export function Hero() {
   const [travelers, setTravelers] = useState('2')
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
-  const destRef = useRef<HTMLDivElement>(null)
+  const destRef = useRef<HTMLFieldSetElement>(null)
   const router = useRouter()
 
   // Filtered destination suggestions
@@ -75,8 +75,8 @@ export function Hero() {
 
           <div className="hero-search" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr auto', gap: 12, alignItems: 'stretch' }}>
             {/* Destination — outlined field with autocomplete dropdown */}
-            <div ref={destRef} className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)' }}>
-              <label htmlFor="hero-dest" className="hero-field-label" style={{ position: 'absolute', top: -8, left: 12, background: 'white', padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)', pointerEvents: 'none' }}>Destination</label>
+            <fieldset ref={destRef} className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)', margin: 0, padding: '0 0 6px', minWidth: 0 }}>
+              <legend className="hero-field-label" style={{ marginInlineStart: 10, padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)' }}>Destination</legend>
               <input
                 id="hero-dest"
                 value={dest}
@@ -88,7 +88,7 @@ export function Hero() {
                 role="combobox"
                 aria-expanded={open}
                 aria-controls="hero-dest-list"
-                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', padding: '17px 16px', color: 'var(--ink-900)' }}
+                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', padding: '4px 16px 13px', color: 'var(--ink-900)' }}
               />
               {open && suggestions.length > 0 && (
                 <div id="hero-dest-list" role="listbox" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, background: 'white', border: '1px solid var(--line)', borderRadius: 12, boxShadow: 'var(--shadow-lg)', overflow: 'hidden auto', zIndex: 30, maxHeight: 312 }}>
@@ -111,16 +111,16 @@ export function Hero() {
                   ))}
                 </div>
               )}
-            </div>
+            </fieldset>
 
             {/* Travellers — outlined field */}
-            <div className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)' }}>
-              <label htmlFor="hero-travelers" className="hero-field-label" style={{ position: 'absolute', top: -8, left: 12, background: 'white', padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)', pointerEvents: 'none' }}>Travellers</label>
+            <fieldset className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)', margin: 0, padding: '0 0 6px', minWidth: 0 }}>
+              <legend className="hero-field-label" style={{ marginInlineStart: 10, padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)' }}>Travellers</legend>
               <select
                 id="hero-travelers"
                 value={travelers}
                 onChange={e => setTravelers(e.target.value)}
-                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', fontFamily: 'inherit', padding: '17px 36px 17px 16px', color: 'var(--ink-900)', appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}
+                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', fontFamily: 'inherit', padding: '4px 36px 13px 16px', color: 'var(--ink-900)', appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}
               >
                 <option value="1">1 traveller</option>
                 <option value="2">2 travellers</option>
@@ -128,8 +128,8 @@ export function Hero() {
                 <option value="4">4 travellers</option>
                 <option value="5">5+ travellers</option>
               </select>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" strokeWidth="2.5" strokeLinecap="round" style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}><path d="M6 9l6 6 6-6"/></svg>
-            </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" strokeWidth="2.5" strokeLinecap="round" style={{ position: 'absolute', right: 14, bottom: 18, pointerEvents: 'none' }}><path d="M6 9l6 6 6-6"/></svg>
+            </fieldset>
 
             <button onClick={handleSearch} className="hero-search-btn press" style={{ background: 'var(--ink-900)', color: 'white', borderRadius: 12, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 15, fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               <Ic.search s={16}/> Search
