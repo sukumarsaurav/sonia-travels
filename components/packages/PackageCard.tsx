@@ -7,10 +7,10 @@ import type { Package } from '@/types'
 
 const formatINR = (n: number) => '₹' + n.toLocaleString('en-IN')
 
-export function PackageCard({ pkg, featured }: { pkg: Package; featured?: boolean }) {
+export function PackageCard({ pkg, featured, reveal = true }: { pkg: Package; featured?: boolean; reveal?: boolean }) {
   const imgHeight = featured ? 280 : 200
   return (
-    <Link href={`/packages/${pkg.id}`} className="lift press reveal" style={{
+    <Link href={`/packages/${pkg.id}`} className={`lift press${reveal ? ' reveal' : ''}`} style={{
       textAlign: 'left', display: 'block', width: '100%',
       background: 'white', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden',
     }}>

@@ -60,7 +60,7 @@ export function PackagesClient({ packages }: { packages: Package[] }) {
       </div>
 
       <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
-        {filtered.map(p => <PackageCard key={p.id} pkg={p}/>)}
+        {filtered.map(p => <PackageCard key={p.id} pkg={p} reveal={false}/>)}
       </div>
 
       {filtered.length === 0 && (
