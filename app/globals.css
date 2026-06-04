@@ -134,6 +134,15 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px rgba(176,74,47,0.12);
 }
 .hero-field:focus-within .hero-field-label { color: var(--terra-700); }
+/* The fieldset already shows focus — suppress the inner input/select focus ring */
+.hero-field input:focus,
+.hero-field input:focus-visible,
+.hero-field select:focus,
+.hero-field select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
 .hero-search-btn { transition: background 0.15s; }
 .hero-search-btn:hover { background: var(--terra-700); }
 
