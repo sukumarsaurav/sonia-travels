@@ -3,7 +3,7 @@ import { Section } from '@/components/ui/Section'
 import { Ic } from '@/components/ui/Icons'
 import { TESTIMONIALS } from '@/lib/data'
 
-const avatarBgs = ['terra', 'forest', 'dark']
+const avatars = ['/avatars/1.jpg', '/avatars/2.jpg', '/avatars/3.jpg', '/avatars/4.jpg', '/avatars/5.jpg']
 const ratings = [4, 4, 4]
 
 export function Testimonials() {
@@ -24,7 +24,7 @@ export function Testimonials() {
               transitionDelay: `${i * 0.08}s`,
             }}>
               <div style={{ fontFamily: 'var(--serif)', fontSize: 96, fontWeight: 700, color: 'var(--ink-900)', lineHeight: 0.7, marginBottom: 12, letterSpacing: '-0.04em' }}>&ldquo;</div>
-              <div className={`ph-img ${avatarBgs[i]}`} style={{ position: 'absolute', top: 28, right: 28, width: 72, height: 72, borderRadius: '50%', border: '3px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.08)' }}/>
+              <img src={avatars[i]} alt={t.name} style={{ position: 'absolute', top: 28, right: 28, width: 72, height: 72, borderRadius: '50%', border: '3px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', objectFit: 'cover' }}/>
               <div style={{ display: 'flex', gap: 4, marginBottom: 18, color: 'var(--terra-700)' }}>
                 {[...Array(5)].map((_, k) => <Ic.star key={k} s={18} style={{ opacity: k < ratings[i] ? 1 : 0.22 }}/>)}
               </div>
