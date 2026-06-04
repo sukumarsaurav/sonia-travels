@@ -114,12 +114,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           ) : (
             <div className={`ph-img ${post.hero}`} style={{ height: '100%' }}/>
           )}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 20%, rgba(0,0,0,0.72))' }}/>
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 40, color: 'white' }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0.38) 0%, transparent 22%, transparent 55%, rgba(0,0,0,0.74) 100%)' }}/>
+
+          {/* Back link — pinned top-left */}
+          <div style={{ position: 'absolute', top: 24, left: 0, right: 0 }}>
             <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
-              <Link href="/blog" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 16, textDecoration: 'none' }}>
+              <Link href="/blog" style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
                 <Ic.arrowL s={13}/> All articles
               </Link>
+            </div>
+          </div>
+
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 40, color: 'white' }}>
+            <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <span style={{ background: 'var(--terra-600)', color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{post.category}</span>
                 {post.tags.slice(0, 3).map(t => (
