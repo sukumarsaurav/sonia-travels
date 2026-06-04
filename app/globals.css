@@ -127,6 +127,16 @@ textarea:focus-visible {
 }
 .input-base:focus { border-color: var(--ink-700); }
 
+/* Hero search — outlined fields with notched label */
+.hero-field { transition: border-color 0.15s, box-shadow 0.15s; }
+.hero-field:focus-within {
+  border-color: var(--terra-600) !important;
+  box-shadow: 0 0 0 3px rgba(176,74,47,0.12);
+}
+.hero-field:focus-within .hero-field-label { color: var(--terra-700); }
+.hero-search-btn { transition: background 0.15s; }
+.hero-search-btn:hover { background: var(--terra-700); }
+
 /* Responsive */
 @media (max-width: 1024px) {
   .nav-links { display: none !important; }
@@ -186,8 +196,7 @@ textarea:focus-visible {
   .pkg-hero-h1 { font-size: 36px !important; line-height: 1 !important; }
   .cabs-stats { gap: 20px !important; flex-wrap: wrap !important; }
   .hero-search { grid-template-columns: 1fr !important; }
-  .hero-search label { border-right: none !important; border-bottom: 1px solid var(--line); }
-  .hero-search label:last-of-type { border-bottom: none !important; }
+  .hero-search-btn { min-height: 52px; }
   .admin-stat-grid { grid-template-columns: 1fr 1fr !important; }
   .booking-modal { grid-template-columns: 1fr !important; }
   .booking-aside { display: none !important; }

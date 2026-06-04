@@ -1,26 +1,61 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Btn } from '@/components/ui/Button'
 import { Ic } from '@/components/ui/Icons'
+import { PACKAGES, formatINR } from '@/lib/data'
 
 export function Hero() {
   const [dest, setDest] = useState('')
   const [travelers, setTravelers] = useState('2')
+  const [open, setOpen] = useState(false)
+  const [active, setActive] = useState(-1)
+  const destRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
-  const handleSearch = () => {
+  // Filtered destination suggestions
+  const q = dest.trim().toLowerCase()
+  const suggestions = q
+    ? PACKAGES.filter(p => p.name.toLowerCase().includes(q) || p.region.toLowerCase().includes(q))
+    : PACKAGES
+
+  const goSearch = (query: string) => {
     const params = new URLSearchParams()
-    const q = dest.trim()
-    if (q) params.set('q', q)
+    const v = query.trim()
+    if (v) params.set('q', v)
     if (travelers !== '2') params.set('travelers', travelers)
     router.push(`/packages${params.size ? `?${params.toString()}` : ''}`)
   }
 
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSearch()
+  const handleSearch = () => goSearch(dest)
+
+  const selectDest = (name: string) => {
+    setDest(name)
+    setOpen(false)
+    goSearch(name)
   }
+
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault(); setOpen(true); setActive(a => Math.min(a + 1, suggestions.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault(); setActive(a => Math.max(a - 1, 0))
+    } else if (e.key === 'Enter') {
+      if (open && active >= 0 && suggestions[active]) selectDest(suggestions[active].name)
+      else handleSearch()
+    } else if (e.key === 'Escape') {
+      setOpen(false)
+    }
+  }
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (destRef.current && !destRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   return (
     <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--sand-100)' }}>
@@ -38,25 +73,54 @@ export function Hero() {
             From the apple orchards of Manali to the backwaters of Kerala — eighteen years of itineraries built around how <em>you</em> like to travel.
           </p>
 
-          <div className="hero-search" style={{ background: 'white', borderRadius: 14, padding: 12, display: 'grid', gridTemplateColumns: '1.4fr 1fr auto', gap: 8, boxShadow: 'var(--shadow-md)', border: '1px solid var(--line)' }}>
-            <div style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
-              <label htmlFor="hero-dest" style={{ display: 'block', fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Destination</label>
+          <div className="hero-search" style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr auto', gap: 12, alignItems: 'stretch' }}>
+            {/* Destination — outlined field with autocomplete dropdown */}
+            <div ref={destRef} className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)' }}>
+              <label htmlFor="hero-dest" className="hero-field-label" style={{ position: 'absolute', top: -8, left: 12, background: 'white', padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)', pointerEvents: 'none' }}>Destination</label>
               <input
                 id="hero-dest"
                 value={dest}
-                onChange={e => setDest(e.target.value)}
+                onChange={e => { setDest(e.target.value); setOpen(true); setActive(-1) }}
+                onFocus={() => setOpen(true)}
                 onKeyDown={handleKey}
-                placeholder="Manali, Goa, Kerala…"
-                style={{ border: 'none', outline: 'none', fontSize: 15, fontWeight: 500, width: '100%', background: 'transparent' }}
+                placeholder="Where to? Manali, Goa, Kerala…"
+                autoComplete="off"
+                role="combobox"
+                aria-expanded={open}
+                aria-controls="hero-dest-list"
+                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', padding: '17px 16px', color: 'var(--ink-900)' }}
               />
+              {open && suggestions.length > 0 && (
+                <div id="hero-dest-list" role="listbox" style={{ position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, background: 'white', border: '1px solid var(--line)', borderRadius: 12, boxShadow: 'var(--shadow-lg)', overflow: 'hidden auto', zIndex: 30, maxHeight: 312 }}>
+                  {suggestions.map((p, i) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="option"
+                      aria-selected={i === active}
+                      onMouseDown={e => { e.preventDefault(); selectDest(p.name) }}
+                      onMouseEnter={() => setActive(i)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '11px 14px', background: i === active ? 'var(--sand-100)' : 'white', border: 'none', borderBottom: i < suggestions.length - 1 ? '1px solid var(--sand-100)' : 'none', cursor: 'pointer' }}
+                    >
+                      <span style={{ width: 34, height: 34, borderRadius: 8, background: 'var(--sand-100)', color: 'var(--terra-700)', display: 'grid', placeItems: 'center', flexShrink: 0 }}><Ic.pin s={16}/></span>
+                      <span style={{ minWidth: 0 }}>
+                        <span style={{ display: 'block', fontSize: 14, fontWeight: 600, color: 'var(--ink-900)' }}>{p.name}</span>
+                        <span style={{ display: 'block', fontSize: 12, color: 'var(--ink-500)' }}>{p.region} · from {formatINR(p.price)}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div style={{ padding: '8px 14px', borderRight: '1px solid var(--line)' }}>
-              <label htmlFor="hero-travelers" style={{ display: 'block', fontSize: 10, color: 'var(--ink-600)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 2 }}>Travellers</label>
+
+            {/* Travellers — outlined field */}
+            <div className="hero-field" style={{ position: 'relative', border: '1.5px solid var(--line)', borderRadius: 12, background: 'white', boxShadow: 'var(--shadow-sm)' }}>
+              <label htmlFor="hero-travelers" className="hero-field-label" style={{ position: 'absolute', top: -8, left: 12, background: 'white', padding: '0 6px', fontSize: 12, fontWeight: 500, color: 'var(--ink-600)', pointerEvents: 'none' }}>Travellers</label>
               <select
                 id="hero-travelers"
                 value={travelers}
                 onChange={e => setTravelers(e.target.value)}
-                style={{ border: 'none', outline: 'none', fontSize: 15, fontWeight: 500, width: '100%', background: 'transparent', fontFamily: 'inherit' }}
+                style={{ border: 'none', outline: 'none', fontSize: 16, fontWeight: 500, width: '100%', background: 'transparent', fontFamily: 'inherit', padding: '17px 36px 17px 16px', color: 'var(--ink-900)', appearance: 'none', WebkitAppearance: 'none', cursor: 'pointer' }}
               >
                 <option value="1">1 traveller</option>
                 <option value="2">2 travellers</option>
@@ -64,8 +128,12 @@ export function Hero() {
                 <option value="4">4 travellers</option>
                 <option value="5">5+ travellers</option>
               </select>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ink-400)" strokeWidth="2.5" strokeLinecap="round" style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}><path d="M6 9l6 6 6-6"/></svg>
             </div>
-            <Btn variant="dark" size="md" icon={<Ic.search s={14}/>} onClick={handleSearch}>Search</Btn>
+
+            <button onClick={handleSearch} className="hero-search-btn press" style={{ background: 'var(--ink-900)', color: 'white', borderRadius: 12, padding: '0 28px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 15, fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <Ic.search s={16}/> Search
+            </button>
           </div>
 
           <div className="hero-trust" style={{ display: 'flex', flexWrap: 'wrap', gap: 20, marginTop: 28, fontSize: 13, color: 'var(--ink-600)' }}>
