@@ -19,7 +19,7 @@ function Avatar({ name, avatar, size = 64 }: { name: string; avatar: string; siz
   const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
   if (avatar) return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={avatar} alt={name} style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--sand-200)' }}/>
+    <img src={avatar} alt={name} referrerPolicy="no-referrer" style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--sand-200)' }}/>
   )
   return (
     <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--terra-600)', color: 'white', display: 'grid', placeItems: 'center', fontSize: size * 0.3, fontWeight: 700, border: '3px solid var(--sand-200)', flexShrink: 0 }}>
@@ -149,7 +149,7 @@ export function AccountShell({ user, bookings }: { user: UserInfo; bookings: Boo
     <div style={{ minHeight: '100vh', background: 'var(--sand-50)' }}>
       {/* Top bar */}
       <header style={{ background: 'white', borderBottom: '1px solid var(--line)', position: 'sticky', top: 0, zIndex: 40, backdropFilter: 'blur(8px)' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '14px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
           <Link href="/"><Logo/></Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <span style={{ fontSize: 14, color: 'var(--ink-500)' }}>Hi, {user.name.split(' ')[0]}</span>
@@ -160,7 +160,7 @@ export function AccountShell({ user, bookings }: { user: UserInfo; bookings: Boo
         </div>
       </header>
 
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1240, margin: '0 auto', padding: '40px 32px' }}>
         {/* Page title */}
         <div style={{ marginBottom: 32 }}>
           <div style={{ fontFamily: 'var(--mono)', fontSize: 10, letterSpacing: '0.18em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 8 }}>My Account</div>

@@ -44,7 +44,7 @@ function UserMenu({ user }: { user: User }) {
       <button onClick={() => setOpen(!open)} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', border: '1px solid var(--line)', borderRadius: 99, background: 'white', cursor: 'pointer' }}>
         {avatar ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={avatar} alt={name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}/>
+          <img src={avatar} alt={name} referrerPolicy="no-referrer" style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}/>
         ) : (
           <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--terra-600)', color: 'white', display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 700 }}>{initials}</div>
         )}

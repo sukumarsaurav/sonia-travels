@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
 // cover Supabase (data + storage), Unsplash images, and the Google Maps embed.
 const csp = [
   "default-src 'self'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://www.google.com https://*.razorpay.com",
+  "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://*.razorpay.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
