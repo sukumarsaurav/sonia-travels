@@ -6,7 +6,8 @@ export interface BlogPost {
   category: string
   readTime: string
   publishedAt: string
-  hero: string // CSS class or placeholder
+  hero: string // CSS class placeholder (fallback)
+  image?: string // local hero image path
   tags: string[]
   seoTitle: string
   seoDesc: string
@@ -21,6 +22,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '6 min read',
     publishedAt: '2025-04-10',
     hero: 'forest',
+    image: '/blog/pathankot-places.jpg',
     tags: ['Pathankot', 'Weekend Getaway', 'Himachal', 'Travel'],
     seoTitle: 'Top 10 Places to Visit Near Pathankot | Weekend Getaways 2025',
     seoDesc: 'Discover the best places to visit near Pathankot — Dalhousie, Dharamshala, Mcleodganj, Amritsar, Kangra & more. Distances, tips and cab fares included.',
@@ -92,6 +94,7 @@ All these destinations are easily accessible by cab from Pathankot. Sonia Travel
     readTime: '7 min read',
     publishedAt: '2025-03-22',
     hero: 'terra',
+    image: '/blog/dalhousie-road.jpg',
     tags: ['Dalhousie', 'Road Trip', 'Cab', 'Himachal'],
     seoTitle: 'Pathankot to Dalhousie Road Trip Guide 2025 | Route, Stops & Tips',
     seoDesc: 'Complete guide for Pathankot to Dalhousie road trip. Route map, distance 80 km, duration 2.5 hrs, stops at Khajjiar. Cab fares and travel tips.',
@@ -153,6 +156,7 @@ Call or WhatsApp **Sonia Travels at +91 84602 22809**. We'll confirm your cab wi
     readTime: '5 min read',
     publishedAt: '2025-02-14',
     hero: 'dark',
+    image: '/blog/dalhousie-season.jpg',
     tags: ['Dalhousie', 'Travel Tips', 'Himachal', 'Weather'],
     seoTitle: 'Best Time to Visit Dalhousie 2025 | Month-by-Month Weather Guide',
     seoDesc: 'When to visit Dalhousie? Complete month-by-month guide covering weather, temperature, snowfall, crowd levels and what to do in each season.',
@@ -206,6 +210,7 @@ From Pathankot, Dalhousie is just 80 km and 2.5 hours by cab — making it viabl
     readTime: '8 min read',
     publishedAt: '2025-01-20',
     hero: 'terra',
+    image: '/blog/vaishno-devi.jpg',
     tags: ['Vaishno Devi', 'Pilgrimage', 'Katra', 'Cab'],
     seoTitle: 'Vaishno Devi Yatra from Pathankot 2025 | Complete Guide & Cab Booking',
     seoDesc: 'Complete guide to Vaishno Devi yatra from Pathankot. Cab to Katra ₹2,200, registration, trek route, helicopter details and stay options.',
@@ -275,6 +280,7 @@ Round-trip bookings available with flexible return timing based on your yatra co
     readTime: '5 min read',
     publishedAt: '2025-01-05',
     hero: 'forest',
+    image: '/blog/taxi-pathankot.jpg',
     tags: ['Pathankot', 'Taxi', 'Local Transport', 'Cab'],
     seoTitle: 'Taxi Service in Pathankot 2025 | Local & Outstation Cab Guide',
     seoDesc: 'Complete guide to taxi services in Pathankot. Local taxis, outstation cabs, rates, best taxi stands and how to book a reliable cab in Pathankot.',

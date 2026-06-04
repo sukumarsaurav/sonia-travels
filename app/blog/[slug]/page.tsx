@@ -5,6 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
+import { SafeImage } from '@/components/ui/SafeImage'
 import { BLOG_POSTS } from '../data'
 import { ArticleSchema } from '@/components/seo/JsonLd'
 
@@ -108,7 +109,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         {/* ── Hero ── */}
         <div style={{ position: 'relative', height: 420, overflow: 'hidden' }}>
-          <div className={`ph-img ${post.hero}`} style={{ height: '100%' }}/>
+          {post.image ? (
+            <SafeImage src={post.image} alt={post.title} fill priority sizes="100vw" style={{ objectFit: 'cover' }} fallbackClass={post.hero}/>
+          ) : (
+            <div className={`ph-img ${post.hero}`} style={{ height: '100%' }}/>
+          )}
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 20%, rgba(0,0,0,0.72))' }}/>
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 40, color: 'white' }}>
             <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
@@ -166,7 +171,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {related.map(p => (
                 <Link key={p.slug} href={`/blog/${p.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="lift" style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 12, overflow: 'hidden' }}>
-                    <div className={`ph-img ${p.hero}`} style={{ height: 160 }}/>
+                    <div style={{ position: 'relative', height: 160 }}>
+                      {p.image ? (
+                        <SafeImage src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} fallbackClass={p.hero}/>
+                      ) : (
+                        <div className={`ph-img ${p.hero}`} style={{ position: 'absolute', inset: 0 }}/>
+                      )}
+                    </div>
                     <div style={{ padding: 20 }}>
                       <div style={{ fontSize: 11, color: 'var(--terra-700)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{p.category}</div>
                       <div style={{ fontFamily: 'var(--serif)', fontSize: 17, fontWeight: 500, lineHeight: 1.25 }}>{p.title}</div>

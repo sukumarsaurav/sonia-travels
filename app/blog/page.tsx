@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { Ic } from '@/components/ui/Icons'
+import { SafeImage } from '@/components/ui/SafeImage'
 import { BLOG_POSTS } from './data'
 
 export const metadata: Metadata = {
@@ -48,7 +49,13 @@ export default function BlogPage() {
         <Section padded>
           <Link href={`/blog/${featured.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="lift featured-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden', background: 'white' }}>
-              <div className={`ph-img ${featured.hero}`} style={{ minHeight: 360 }}/>
+              <div style={{ position: 'relative', minHeight: 360 }}>
+                {featured.image ? (
+                  <SafeImage src={featured.image} alt={featured.title} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} fallbackClass={featured.hero}/>
+                ) : (
+                  <div className={`ph-img ${featured.hero}`} style={{ position: 'absolute', inset: 0 }}/>
+                )}
+              </div>
               <div style={{ padding: '48px 40px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
                   <span style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{featured.category}</span>
@@ -74,7 +81,13 @@ export default function BlogPage() {
               {rest.map((post, i) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="lift reveal" style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', transitionDelay: `${i * 0.07}s` }}>
-                    <div className={`ph-img ${post.hero}`} style={{ height: 200 }}/>
+                    <div style={{ position: 'relative', height: 200 }}>
+                      {post.image ? (
+                        <SafeImage src={post.image} alt={post.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} fallbackClass={post.hero}/>
+                      ) : (
+                        <div className={`ph-img ${post.hero}`} style={{ position: 'absolute', inset: 0 }}/>
+                      )}
+                    </div>
                     <div style={{ padding: 24 }}>
                       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                         <span style={{ background: 'var(--terra-100)', color: 'var(--terra-700)', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 99, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{post.category}</span>
