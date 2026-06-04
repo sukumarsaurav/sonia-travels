@@ -8,6 +8,7 @@ const csp = [
   "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://www.google.com https://*.googleusercontent.com https://*.razorpay.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
+  "media-src 'self' blob: https://*.supabase.co",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
   "connect-src 'self' https://*.supabase.co https://*.razorpay.com https://lumberjack.razorpay.com",
   "frame-src https://www.google.com https://api.razorpay.com https://checkout.razorpay.com",

@@ -5,6 +5,7 @@ import { Splash } from '@/components/layout/Splash'
 import { Hero } from '@/components/home/Hero'
 import { FeaturedPackages } from '@/components/packages/FeaturedPackages'
 import { ServiceStrip } from '@/components/home/ServiceStrip'
+import { ReelsSection } from '@/components/home/ReelsSection'
 import { WhyUs } from '@/components/home/WhyUs'
 import { Testimonials } from '@/components/home/Testimonials'
 import { FAQSection } from '@/components/home/FAQ'
@@ -43,6 +44,7 @@ export default function HomePage() {
           <Hero/>
           <FeaturedPackages/>
           <ServiceStrip/>
+          <ReelsSection/>
           <WhyUs/>
           <Testimonials/>
           <FAQSection/>

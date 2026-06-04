@@ -6,6 +6,7 @@ import { Ic } from '@/components/ui/Icons'
 import { Field, Input, Select, Textarea } from '@/components/ui/Form'
 import { Modal } from '@/components/ui/Modal'
 import { PackageModal } from '@/components/admin/PackageModal'
+import { AdminReels } from '@/components/admin/AdminReels'
 import { createBrowserSupabase } from '@/lib/supabase-browser'
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -915,6 +916,7 @@ export function AdminShell({ user }: { user: UserInfo }) {
     { id: 'payments',  l: 'Payments',  ic: Ic.card },
     { id: 'customers', l: 'Customers', ic: Ic.users },
     { id: 'reviews',   l: 'Reviews',   ic: Ic.star },
+    { id: 'reels',     l: 'Reels',     ic: Ic.film },
     { id: 'content',   l: 'Content',   ic: Ic.cog },
     { id: 'settings',  l: 'Settings',  ic: Ic.cog },
   ]
@@ -984,6 +986,7 @@ export function AdminShell({ user }: { user: UserInfo }) {
         {route === 'payments'  && <AdminPayments/>}
         {route === 'customers' && <AdminCustomers/>}
         {route === 'reviews'   && <AdminReviews/>}
+        {route === 'reels'     && <AdminReels/>}
         {route === 'content'   && <AdminContent/>}
         {route === 'settings'  && <AdminSettings/>}
       </main>

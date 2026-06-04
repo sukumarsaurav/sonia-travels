@@ -167,6 +167,7 @@ textarea:focus-visible {
   .pkg-detail-grid { grid-template-columns: 1fr !important; }
   .blog-layout { grid-template-columns: 1fr !important; }
   .blog-sidebar { position: static !important; }
+  .reel-arrow { display: none !important; }
   .admin-row-2 { grid-template-columns: 1fr !important; }
   .mobile-book-bar { display: flex !important; }
   .has-mobile-bar { padding-bottom: 80px; }
@@ -208,3 +209,7 @@ textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .reveal, .lift, .wa-pulse, .splash-anim, .modal-scrim, .modal-card { animation: none !important; transition: none !important; }
 }
+
+/* Reels carousel — hide scrollbar, smooth horizontal scroll */
+.reel-track { -webkit-overflow-scrolling: touch; }
+.reel-track::-webkit-scrollbar { display: none; }

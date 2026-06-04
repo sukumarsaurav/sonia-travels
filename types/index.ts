@@ -61,3 +61,14 @@ export interface Testimonial {
   text: string
   rating?: number
 }
+
+export interface Reel {
+  id: string
+  caption: string | null
+  video_url: string | null
+  poster_url: string | null
+  instagram_url: string | null
+  sort_order: number
+  active: boolean
+  created_at?: string
+}
