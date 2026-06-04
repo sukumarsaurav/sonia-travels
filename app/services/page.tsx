@@ -5,6 +5,7 @@ import { Btn } from '@/components/ui/Button'
 import { Section } from '@/components/ui/Section'
 import { Ic } from '@/components/ui/Icons'
 import { RevealProvider } from '@/components/ui/Reveal'
+import { SafeImage } from '@/components/ui/SafeImage'
 
 const services = [
   { id: 'packages', ic: Ic.pkg, hero: 'terra', title: 'Tour Packages', tagline: '10 destinations, fully arranged', desc: 'Hand-built itineraries across India — mountains, beaches, heritage and backwaters. Hotels, transfers, guides and meals bundled into one fixed price.', starts: '₹6,300', unit: 'per person', bullets: ['Customised by group size & pace', '3-star or better stays', 'Private vehicle + local guide', 'Daily breakfast included'], cta: 'Browse packages' },
@@ -86,8 +87,15 @@ export default function ServicesPage() {
                       </div>
                     </div>
                   </div>
-                  <div style={{ order: reverse ? 1 : 2, position: 'relative', height: 420 }}>
-                    <div className={`ph-img ${s.hero}`} style={{ position: 'absolute', inset: 0, borderRadius: 16, boxShadow: 'var(--shadow-md)' }}/>
+                  <div style={{ order: reverse ? 1 : 2, position: 'relative', height: 420, borderRadius: 16, overflow: 'hidden', boxShadow: 'var(--shadow-md)' }}>
+                    <SafeImage
+                      src={`/services/${s.id}.jpg`}
+                      alt={s.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      style={{ objectFit: 'cover' }}
+                      fallbackClass={s.hero}
+                    />
                   </div>
                 </div>
               )
