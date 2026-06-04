@@ -114,14 +114,7 @@ export function Navbar() {
           </Btn>
         </div>
 
-        {/* WhatsApp icon-only — visible on mobile where nav-admin-cta is hidden */}
-        <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer"
-          aria-label="Chat on WhatsApp"
-          className="nav-wa-mobile"
-          style={{ display: 'none', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: 8, background: '#25D366', color: 'white', flexShrink: 0 }}>
-          <Ic.whatsapp s={20}/>
-        </a>
-
+        {/* On mobile, WhatsApp lives in the global floating button (FloatingWhatsApp) */}
         <button className="nav-toggle" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}
           style={{ width: 40, height: 40, borderRadius: 8, border: '1px solid var(--line)', background: 'white', display: 'none', placeItems: 'center' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

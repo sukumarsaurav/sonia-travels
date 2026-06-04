@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
+import { FloatingWhatsApp } from '@/components/layout/FloatingWhatsApp'
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body>{children}</body>
+      <body>{children}<FloatingWhatsApp/></body>
     </html>
   )
 }

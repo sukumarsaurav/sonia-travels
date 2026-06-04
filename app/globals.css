@@ -147,7 +147,9 @@ textarea:focus-visible {
   }
   .nav-toggle { display: grid !important; }
   .nav-admin-cta { display: none !important; }
-  .nav-wa-mobile { display: flex !important; }
+  /* Detail pages already have a WhatsApp button in the sticky booking bar,
+     so hide the redundant floating one there to avoid overlap. */
+  body:has(.mobile-book-bar) .wa-float { display: none !important; }
   .hero-grid { grid-template-columns: 1fr !important; }
   .hero-collage { display: none !important; }
   .grid-3 { grid-template-columns: 1fr 1fr !important; }
