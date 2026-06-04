@@ -1,16 +1,16 @@
 import type { Package, Booking, Inquiry, Payment, Testimonial } from '@/types'
 
 export const PACKAGES: Package[] = [
-  { id: "manali", name: "Manali", region: "Himachal Pradesh", days: 5, nights: 4, price: 7200, hero: "terra", tag: "Mountains", desc: "Snow-capped peaks, apple orchards & the Beas river.", hero_url: "https://images.unsplash.com/photo-1605640874680-eb88708d57d2?auto=format&fit=crop&w=800&q=80" },
-  { id: "goa", name: "Goa", region: "West Coast", days: 4, nights: 3, price: 7200, hero: "forest", tag: "Beach", desc: "Sun-bleached beaches, Portuguese cafés & nightlife.", hero_url: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80" },
-  { id: "jaipur", name: "Jaipur", region: "Rajasthan", days: 4, nights: 3, price: 7200, hero: "terra", tag: "Heritage", desc: "Pink City forts, palaces & bazaars.", hero_url: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=800&q=80" },
-  { id: "ooty", name: "Ooty", region: "Tamil Nadu", days: 4, nights: 3, price: 6300, hero: "forest", tag: "Hill Station", desc: "Tea gardens, toy trains & Nilgiri air.", hero_url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80" },
-  { id: "munnar", name: "Munnar", region: "Kerala", days: 4, nights: 3, price: 6300, hero: "forest", tag: "Hill Station", desc: "Cardamom hills & emerald tea estates.", hero_url: "https://images.unsplash.com/photo-1593693397690-362cb9666c6b?auto=format&fit=crop&w=800&q=80" },
-  { id: "darjeeling", name: "Darjeeling", region: "West Bengal", days: 5, nights: 4, price: 8100, hero: "forest", tag: "Mountains", desc: "Tiger Hill sunrise & Kanchenjunga views.", hero_url: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80" },
-  { id: "uttarakhand", name: "Uttarakhand", region: "Himalayas", days: 6, nights: 5, price: 9000, hero: "forest", tag: "Mountains", desc: "Char Dham trails, Nainital & Rishikesh.", hero_url: "https://images.unsplash.com/photo-1610715936287-6c2ad208cdbf?auto=format&fit=crop&w=800&q=80" },
-  { id: "himachal", name: "Himachal Pradesh", region: "North India", days: 7, nights: 6, price: 10800, hero: "terra", tag: "Mountains", desc: "Shimla–Manali–Dharamshala circuit.", hero_url: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?auto=format&fit=crop&w=800&q=80" },
-  { id: "kerala", name: "Kerala", region: "South India", days: 6, nights: 5, price: 14400, hero: "forest", tag: "Backwaters", desc: "Houseboats, Kathakali & spice trails.", hero_url: "https://images.unsplash.com/photo-1602216056096-3b40cc0e9944?auto=format&fit=crop&w=800&q=80" },
-  { id: "ladakh", name: "Ladakh", region: "High Himalaya", days: 8, nights: 7, price: 22500, hero: "dark", tag: "Adventure", desc: "Pangong Lake, Nubra Valley & monasteries.", hero_url: "https://images.unsplash.com/photo-1581459529068-1eb5d452936a?auto=format&fit=crop&w=800&q=80" },
+  { id: "manali", name: "Manali", region: "Himachal Pradesh", days: 5, nights: 4, price: 7200, hero: "terra", tag: "Mountains", desc: "Snow-capped peaks, apple orchards & the Beas river.", hero_url: "/packages/manali.jpg" },
+  { id: "goa", name: "Goa", region: "West Coast", days: 4, nights: 3, price: 7200, hero: "forest", tag: "Beach", desc: "Sun-bleached beaches, Portuguese cafés & nightlife.", hero_url: "/packages/goa.jpg" },
+  { id: "jaipur", name: "Jaipur", region: "Rajasthan", days: 4, nights: 3, price: 7200, hero: "terra", tag: "Heritage", desc: "Pink City forts, palaces & bazaars.", hero_url: "/packages/jaipur.jpg" },
+  { id: "ooty", name: "Ooty", region: "Tamil Nadu", days: 4, nights: 3, price: 6300, hero: "forest", tag: "Hill Station", desc: "Tea gardens, toy trains & Nilgiri air.", hero_url: "/packages/ooty.jpg" },
+  { id: "munnar", name: "Munnar", region: "Kerala", days: 4, nights: 3, price: 6300, hero: "forest", tag: "Hill Station", desc: "Cardamom hills & emerald tea estates.", hero_url: "/packages/munnar.jpg" },
+  { id: "darjeeling", name: "Darjeeling", region: "West Bengal", days: 5, nights: 4, price: 8100, hero: "forest", tag: "Mountains", desc: "Tiger Hill sunrise & Kanchenjunga views.", hero_url: "/packages/darjeeling.jpg" },
+  { id: "uttarakhand", name: "Uttarakhand", region: "Himalayas", days: 6, nights: 5, price: 9000, hero: "forest", tag: "Mountains", desc: "Char Dham trails, Nainital & Rishikesh.", hero_url: "/packages/uttarakhand.jpg" },
+  { id: "himachal", name: "Himachal Pradesh", region: "North India", days: 7, nights: 6, price: 10800, hero: "terra", tag: "Mountains", desc: "Shimla–Manali–Dharamshala circuit.", hero_url: "/packages/himachal.jpg" },
+  { id: "kerala", name: "Kerala", region: "South India", days: 6, nights: 5, price: 14400, hero: "forest", tag: "Backwaters", desc: "Houseboats, Kathakali & spice trails.", hero_url: "/packages/kerala.jpg" },
+  { id: "ladakh", name: "Ladakh", region: "High Himalaya", days: 8, nights: 7, price: 22500, hero: "dark", tag: "Adventure", desc: "Pangong Lake, Nubra Valley & monasteries.", hero_url: "/packages/ladakh.jpg" },
 ]
 
 export const TESTIMONIALS: Testimonial[] = [

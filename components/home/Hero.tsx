@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Btn } from '@/components/ui/Button'
 import { Ic } from '@/components/ui/Icons'
@@ -75,8 +76,8 @@ export function Hero() {
         </div>
 
         <div className="hero-collage" style={{ position: 'relative', height: 560 }}>
-          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80" alt="Taj Mahal, India" style={{ position: 'absolute', top: 0, right: 0, width: 360, height: 460, borderRadius: 16, transform: 'rotate(2deg)', objectFit: 'cover', boxShadow: 'var(--shadow-md)' }}/>
-          <img src="https://images.unsplash.com/photo-1623194098675-9273f00e99d8?auto=format&fit=crop&w=600&q=80" alt="Kerala backwaters" style={{ position: 'absolute', bottom: 0, left: 0, width: 280, height: 340, borderRadius: 16, transform: 'rotate(-3deg)', objectFit: 'cover', boxShadow: 'var(--shadow-lg)' }}/>
+          <Image src="/hero/taj.jpg" alt="Taj Mahal, India" width={360} height={460} priority style={{ position: 'absolute', top: 0, right: 0, width: 360, height: 460, borderRadius: 16, transform: 'rotate(2deg)', objectFit: 'cover', boxShadow: 'var(--shadow-md)' }}/>
+          <Image src="/hero/backwaters.jpg" alt="Kerala backwaters" width={280} height={340} priority style={{ position: 'absolute', bottom: 0, left: 0, width: 280, height: 340, borderRadius: 16, transform: 'rotate(-3deg)', objectFit: 'cover', boxShadow: 'var(--shadow-lg)' }}/>
         </div>
       </div>
 

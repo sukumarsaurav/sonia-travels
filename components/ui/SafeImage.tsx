@@ -22,12 +22,12 @@ export function SafeImage({ fallbackClass = '', className, style, ...props }: Sa
     )
   }
 
-  // Bypass Next.js server-side image optimization for external CDN URLs.
-  // Unsplash (and similar CDNs) block requests from Vercel's serverless IPs,
-  // so _next/image returns 404 in production. Supabase Storage URLs are safe
-  // to optimize because they're fetched from a trusted, predictable origin.
+  // Local images (/public) and Supabase Storage are optimized normally.
+  // Only bypass optimization for *external* CDN URLs (e.g. Unsplash), which
+  // can block Vercel's serverless IPs and make _next/image 404 in production.
   const src = typeof props.src === 'string' ? props.src : ''
-  const unoptimized = src.length > 0 && !src.includes('supabase.co')
+  const isExternal = /^https?:\/\//i.test(src)
+  const unoptimized = isExternal && !src.includes('supabase.co')
 
   return (
     <Image
