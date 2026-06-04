@@ -118,7 +118,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Back link — pinned top-left */}
           <div style={{ position: 'absolute', top: 24, left: 0, right: 0 }}>
-            <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px' }}>
               <Link href="/blog" style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
                 <Ic.arrowL s={13}/> All articles
               </Link>
@@ -126,7 +126,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
 
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 40, color: 'white' }}>
-            <div style={{ maxWidth: 860, margin: '0 auto', padding: '0 32px' }}>
+            <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px' }}>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
                 <span style={{ background: 'var(--terra-600)', color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 99, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{post.category}</span>
                 {post.tags.slice(0, 3).map(t => (
@@ -143,57 +143,61 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
         </div>
 
-        {/* ── Article body ── */}
-        <div style={{ maxWidth: 860, margin: '0 auto', padding: '56px 32px' }}>
-          <p style={{ fontSize: 18, color: 'var(--ink-700)', lineHeight: 1.7, margin: '0 0 32px', fontStyle: 'italic', paddingBottom: 32, borderBottom: '1px solid var(--line)' }}>
-            {post.excerpt}
-          </p>
+        {/* ── Two-column layout: article (left) + sticky sidebar (right) ── */}
+        <div className="blog-layout" style={{ maxWidth: 1240, margin: '0 auto', padding: '56px 32px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: 56, alignItems: 'start' }}>
 
-          {/* Body rendered from HTML string — avoids dynamic JSX element types */}
-          <div dangerouslySetInnerHTML={{ __html: mdToHtml(post.body) }}/>
+          {/* LEFT — article */}
+          <article style={{ minWidth: 0 }}>
+            <p style={{ fontSize: 18, color: 'var(--ink-700)', lineHeight: 1.7, margin: '0 0 32px', fontStyle: 'italic', paddingBottom: 32, borderBottom: '1px solid var(--line)' }}>
+              {post.excerpt}
+            </p>
+            {/* Body rendered from HTML string — avoids dynamic JSX element types */}
+            <div dangerouslySetInnerHTML={{ __html: mdToHtml(post.body) }}/>
+          </article>
 
-          {/* ── CTA strip ── */}
-          <div style={{ marginTop: 48, padding: '28px', background: 'var(--sand-100)', borderRadius: 14, border: '1px solid var(--sand-200)' }}>
-            <div style={{ fontFamily: 'var(--serif)', fontSize: 22, fontWeight: 500, marginBottom: 8 }}>Planning this trip?</div>
-            <p style={{ fontSize: 14, color: 'var(--ink-700)', margin: '0 0 16px' }}>We handle cabs, packages, hotels and more from Pathankot. Call or WhatsApp us — we will sort out the details.</p>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'var(--ink-900)', color: 'white', padding: '11px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                <Ic.phone s={14}/> Call Now
-              </a>
-              <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#25D366', color: 'white', padding: '11px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
-                <Ic.whatsapp s={14}/> WhatsApp
-              </a>
-              <Link href="/cabs" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid var(--line)', color: 'var(--ink-900)', padding: '11px 20px', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
-                View cab fares <Ic.arrow s={13}/>
-              </Link>
+          {/* RIGHT — sticky sidebar */}
+          <aside className="blog-sidebar" style={{ position: 'sticky', top: 96, display: 'grid', gap: 24 }}>
+
+            {/* CTA card */}
+            <div style={{ background: 'var(--ink-900)', color: 'var(--sand-100)', borderRadius: 14, padding: 24 }}>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: 20, fontWeight: 500, marginBottom: 8, color: 'var(--sand-50)' }}>Planning this trip?</div>
+              <p style={{ fontSize: 13, color: 'var(--sand-300)', margin: '0 0 16px', lineHeight: 1.55 }}>We handle cabs, packages &amp; hotels from Pathankot — call or WhatsApp us.</p>
+              <div style={{ display: 'grid', gap: 8 }}>
+                <a href="tel:+918460222809" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'var(--gold-500)', color: 'var(--ink-900)', padding: '11px 16px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                  <Ic.phone s={14}/> Call Now
+                </a>
+                <a href="https://wa.me/918460222809" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: '#25D366', color: 'white', padding: '11px 16px', borderRadius: 8, fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>
+                  <Ic.whatsapp s={14}/> WhatsApp
+                </a>
+                <Link href="/cabs" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--sand-100)', padding: '11px 16px', borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: 'none' }}>
+                  View cab fares <Ic.arrow s={13}/>
+                </Link>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* ── Related posts ── */}
-        <div style={{ background: 'var(--sand-50)', paddingBottom: 64 }}>
-          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 32px' }}>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 24, paddingTop: 48 }}>More articles</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="grid-3">
-              {related.map(p => (
-                <Link key={p.slug} href={`/blog/${p.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className="lift" style={{ background: 'white', border: '1px solid var(--line)', borderRadius: 12, overflow: 'hidden' }}>
-                    <div style={{ position: 'relative', height: 160 }}>
+            {/* Related articles */}
+            <div>
+              <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '0.16em', color: 'var(--terra-700)', textTransform: 'uppercase', marginBottom: 14 }}>More articles</div>
+              <div style={{ display: 'grid', gap: 12 }}>
+                {related.map(p => (
+                  <Link key={p.slug} href={`/blog/${p.slug}`} className="lift" style={{ display: 'flex', textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid var(--line)', borderRadius: 10, overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', width: 92, flexShrink: 0 }}>
                       {p.image ? (
-                        <SafeImage src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: 'cover' }} fallbackClass={p.hero}/>
+                        <SafeImage src={p.image} alt={p.title} fill sizes="92px" style={{ objectFit: 'cover' }} fallbackClass={p.hero}/>
                       ) : (
                         <div className={`ph-img ${p.hero}`} style={{ position: 'absolute', inset: 0 }}/>
                       )}
                     </div>
-                    <div style={{ padding: 20 }}>
-                      <div style={{ fontSize: 11, color: 'var(--terra-700)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>{p.category}</div>
-                      <div style={{ fontFamily: 'var(--serif)', fontSize: 17, fontWeight: 500, lineHeight: 1.25 }}>{p.title}</div>
+                    <div style={{ padding: '12px 14px', minWidth: 0 }}>
+                      <div style={{ fontSize: 10, color: 'var(--terra-700)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>{p.category}</div>
+                      <div style={{ fontFamily: 'var(--serif)', fontSize: 15, fontWeight: 500, lineHeight: 1.25 }}>{p.title}</div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+
+          </aside>
         </div>
 
       </main>

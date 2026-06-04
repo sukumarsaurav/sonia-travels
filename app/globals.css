@@ -165,6 +165,8 @@ textarea:focus-visible {
   .admin-detail-grid { grid-template-columns: 1fr !important; }
   .services-row { grid-template-columns: 1fr !important; }
   .pkg-detail-grid { grid-template-columns: 1fr !important; }
+  .blog-layout { grid-template-columns: 1fr !important; }
+  .blog-sidebar { position: static !important; }
   .admin-row-2 { grid-template-columns: 1fr !important; }
   .mobile-book-bar { display: flex !important; }
   .has-mobile-bar { padding-bottom: 80px; }
