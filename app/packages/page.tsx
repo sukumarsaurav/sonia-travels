@@ -6,6 +6,7 @@ import { Section } from '@/components/ui/Section'
 import { RevealProvider } from '@/components/ui/Reveal'
 import { createServerSupabase } from '@/lib/supabase-server'
 import type { Package } from '@/types'
+import { PACKAGES } from '@/lib/data'
 
 export const metadata: Metadata = {
   title: 'Tour Packages from Pathankot | Manali, Goa, Kerala, Ladakh & More | Sonia Travels',
@@ -30,7 +31,7 @@ export default async function PackagesPage() {
     .eq('active', true)
     .order('name')
 
-  const packages = (data || []) as Package[]
+  const packages = (data && data.length > 0) ? (data as Package[]) : PACKAGES
 
   return (
     <RevealProvider>

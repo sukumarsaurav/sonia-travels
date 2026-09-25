@@ -1,13 +1,22 @@
 'use client'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 export function Splash() {
+  const [mounted, setMounted] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(false), 1200)
+    return () => clearTimeout(t)
+  }, [])
+
+  if (!mounted) return null
+
   return (
     <div className="splash-anim" style={{
       position: 'fixed', inset: 0, zIndex: 999,
       background: 'var(--sand-50)',
       display: 'grid', placeItems: 'center',
-      pointerEvents: 'none',
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
         <div style={{ position: 'relative', width: 96, height: 96 }}>
